@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   AppSettings,
-  UserRole,
+  UserProfile,
   Ustadz,
   Santri,
   PiketSchedule,
@@ -15,7 +15,7 @@ import {
   AuditLog,
   ReportType,
 } from './types';
-import { DEFAULT_SETTINGS } from './lib/constants';
+import { DEFAULT_SETTINGS, DEFAULT_ADMIN } from './lib/constants';
 import {
   getAppSettings,
   getUstadzList,
@@ -26,26 +26,34 @@ import {
   getAuditLogs,
 } from './lib/db';
 import { getSupabaseClient } from './lib/supabase';
+import { LoginForm } from './components/LoginForm';
 import { Header } from './components/Header';
 import { Sidebar, NavigationTab } from './components/Sidebar';
 import { ReportPreviewModal } from './components/ReportPreviewModal';
 import { DashboardView } from './views/DashboardView';
 import { JadwalPiketView } from './views/JadwalPiketView';
-import { DataUstadzView } from './views/DataUstadzView';
-import { DataSantriView } from './views/DataSantriView';
-import { AbsensiHarianView } from './views/AbsensiHarianView';
 import { KegiatanMalamView } from './views/KegiatanMalamView';
 import { KegiatanPagiView } from './views/KegiatanPagiView';
 import { RekapBulananView } from './views/RekapBulananView';
+import { DataUstadzView } from './views/DataUstadzView';
+import { DataSantriView } from './views/DataSantriView';
 import { CetakEksporView } from './views/CetakEksporView';
 import { ImporExcelView } from './views/ImporExcelView';
 import { RiwayatAktivitasView } from './views/RiwayatAktivitasView';
 import { PengaturanView } from './views/PengaturanView';
-import { ManajemenPenggunaView } from './views/ManajemenPenggunaView';
 
 export default function App() {
+  // Authentication State (Peran hanya satu: Admin)
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
+    try {
+      const saved = localStorage.getItem('ponpes_auth_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const [currentTab, setCurrentTab] = useState<NavigationTab>('dashboard');
-  const [userRole, setUserRole] = useState<UserRole>('admin');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Core Data State
@@ -68,7 +76,7 @@ export default function App() {
     isOpen: false,
     type: 'rekap_santri_bulanan',
     title: 'Rekap Kehadiran Santri Bulanan',
-    periodText: 'Bulan Oktober 2026',
+    periodText: 'Bulan Berjalan',
   });
 
   const isSupabaseLive = Boolean(getSupabaseClient());
@@ -111,6 +119,13 @@ export default function App() {
     refreshAllData();
   }, [refreshAllData]);
 
+  const handleLogout = () => {
+    if (confirm('Apakah Anda yakin ingin keluar dari aplikasi?')) {
+      localStorage.removeItem('ponpes_auth_user');
+      setCurrentUser(null);
+    }
+  };
+
   const handleOpenPreview = (type: ReportType, title: string, periodText: string) => {
     setPreviewModal({
       isOpen: true,
@@ -124,12 +139,22 @@ export default function App() {
     setPreviewModal((prev) => ({ ...prev, isOpen: false }));
   };
 
+  // If user is not logged in, render the clean login screen
+  if (!currentUser) {
+    return (
+      <LoginForm
+        settings={settings}
+        onLoginSuccess={(user) => setCurrentUser(user)}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-emerald-100 selection:text-emerald-900">
-      {/* Top Bar Contract Header */}
+      {/* Header Bar */}
       <Header
-        currentRole={userRole}
-        onRoleChange={setUserRole}
+        currentUser={currentUser}
+        onLogout={handleLogout}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         settings={settings}
         isSupabaseLive={isSupabaseLive}
@@ -137,13 +162,12 @@ export default function App() {
 
       {/* Main Layout Area */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Pastel Rounded Navigation Sidebar */}
+        {/* Navigation Sidebar */}
         <Sidebar
           currentTab={currentTab}
           onSelectTab={setCurrentTab}
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
-          userRole={userRole}
         />
 
         {/* Viewport Content Canvas */}
@@ -168,7 +192,7 @@ export default function App() {
                     sessions={sessions}
                     attendances={attendances}
                     auditLogs={auditLogs}
-                    userRole={userRole}
+                    userRole="admin"
                     onNavigate={setCurrentTab}
                   />
                 )}
@@ -177,50 +201,15 @@ export default function App() {
                   <JadwalPiketView
                     schedules={schedules}
                     ustadzList={ustadzList}
-                    userRole={userRole}
                     settings={settings}
                     onRefresh={refreshAllData}
                     onOpenReportModal={(type) =>
                       handleOpenPreview(
                         type,
                         type === 'jadwal_mingguan'
-                          ? 'Jadwal Piket Ustadz Mingguan'
-                          : 'Jadwal Piket Ustadz Bulanan',
+                          ? 'Jadwal Piket Ustadz & Ustadzah Mingguan'
+                          : 'Jadwal Piket Ustadz & Ustadzah Bulanan',
                         'Pekan Berjalan'
-                      )
-                    }
-                  />
-                )}
-
-                {currentTab === 'data_ustadz' && (
-                  <DataUstadzView
-                    ustadzList={ustadzList}
-                    userRole={userRole}
-                    onRefresh={refreshAllData}
-                  />
-                )}
-
-                {currentTab === 'data_santri' && (
-                  <DataSantriView
-                    santriList={santriList}
-                    userRole={userRole}
-                    onRefresh={refreshAllData}
-                  />
-                )}
-
-                {currentTab === 'absensi_harian' && (
-                  <AbsensiHarianView
-                    santriList={santriList}
-                    sessions={sessions}
-                    attendances={attendances}
-                    userRole={userRole}
-                    settings={settings}
-                    onRefresh={refreshAllData}
-                    onOpenReportModal={(type) =>
-                      handleOpenPreview(
-                        type,
-                        'Absensi Santri Harian',
-                        `Tanggal ${new Date().toISOString().split('T')[0]}`
                       )
                     }
                   />
@@ -232,7 +221,6 @@ export default function App() {
                     ustadzList={ustadzList}
                     santriList={santriList}
                     attendances={attendances}
-                    userRole={userRole}
                     settings={settings}
                     onRefresh={refreshAllData}
                     onOpenReportModal={(type) =>
@@ -251,7 +239,6 @@ export default function App() {
                     ustadzList={ustadzList}
                     santriList={santriList}
                     attendances={attendances}
-                    userRole={userRole}
                     settings={settings}
                     onRefresh={refreshAllData}
                     onOpenReportModal={(type) =>
@@ -271,7 +258,7 @@ export default function App() {
                     schedules={schedules}
                     sessions={sessions}
                     attendances={attendances}
-                    userRole={userRole}
+                    userRole="admin"
                     settings={settings}
                     onOpenReportModal={(type) =>
                       handleOpenPreview(
@@ -282,6 +269,22 @@ export default function App() {
                         'Bulan Oktober 2026'
                       )
                     }
+                  />
+                )}
+
+                {currentTab === 'data_ustadz' && (
+                  <DataUstadzView
+                    ustadzList={ustadzList}
+                    userRole="admin"
+                    onRefresh={refreshAllData}
+                  />
+                )}
+
+                {currentTab === 'data_santri' && (
+                  <DataSantriView
+                    santriList={santriList}
+                    userRole="admin"
+                    onRefresh={refreshAllData}
                   />
                 )}
 
@@ -299,7 +302,7 @@ export default function App() {
 
                 {currentTab === 'impor_excel' && (
                   <ImporExcelView
-                    userRole={userRole}
+                    userRole="admin"
                     onRefresh={refreshAllData}
                   />
                 )}
@@ -307,20 +310,16 @@ export default function App() {
                 {currentTab === 'riwayat_aktivitas' && (
                   <RiwayatAktivitasView
                     auditLogs={auditLogs}
-                    userRole={userRole}
+                    userRole="admin"
                   />
                 )}
 
                 {currentTab === 'pengaturan' && (
                   <PengaturanView
                     settings={settings}
-                    userRole={userRole}
+                    userRole="admin"
                     onRefresh={refreshAllData}
                   />
-                )}
-
-                {currentTab === 'manajemen_pengguna' && (
-                  <ManajemenPenggunaView userRole={userRole} />
                 )}
               </>
             )}
@@ -328,7 +327,7 @@ export default function App() {
         </main>
       </div>
 
-      {/* Formal Document Preview Modal (A4 Print / PDF / Excel) */}
+      {/* Document Preview Modal */}
       <ReportPreviewModal
         isOpen={previewModal.isOpen}
         onClose={handleClosePreview}

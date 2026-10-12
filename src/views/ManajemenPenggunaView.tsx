@@ -16,7 +16,7 @@ export const ManajemenPenggunaView: React.FC<ManajemenPenggunaViewProps> = ({
   // Form State
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<UserRole>('ustadz_piket');
+  const [role, setRole] = useState<UserRole>('admin');
 
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();

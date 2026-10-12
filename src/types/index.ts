@@ -1,19 +1,22 @@
-export type UserRole = 'admin' | 'ustadz_piket' | 'kepala_pengawas';
+export type UserRole = 'admin';
 
 export interface UserProfile {
   id: string;
   email: string;
   fullName: string;
-  role: UserRole;
+  role: 'admin';
   isActive: boolean;
-  ustadzId?: string;
   avatarUrl?: string;
 }
+
+export type Gender = 'L' | 'P';
 
 export interface Ustadz {
   id: string;
   employeeNumber: string; // NIP / NIU
   fullName: string;
+  gender?: Gender; // L untuk Ustadz, P untuk Ustadzah
+  titlePrefix?: 'Ustadz' | 'Ustadzah';
   phone: string;
   email?: string;
   specialization?: string; // Bidang (Tahfidz, Fiqih, Umum)
@@ -38,13 +41,16 @@ export interface Santri {
   createdAt: string;
 }
 
-export type PiketStatus = 'terjadwal' | 'sudah_bertugas' | 'belum_bertugas' | 'perlu_verifikasi' | 'izin_diganti';
+export type PiketStatus = 'terjadwal' | 'sudah_bertugas' | 'belum_bertugas' | 'izin_diganti';
+
+export type SessionType = 'night' | 'morning';
 
 export interface PiketSchedule {
   id: string;
   ustadzId: string;
   ustadzName?: string;
   scheduleDate: string; // YYYY-MM-DD
+  sessionType: 'night' | 'morning' | 'both'; // Piket Kegiatan Malam, Pagi, atau Keduanya
   dayName: string; // Senin, Selasa, dll
   weekStart: string; // YYYY-MM-DD (start of that calendar week)
   status: PiketStatus;
@@ -69,23 +75,11 @@ export interface PiketRealization {
   createdAt: string;
 }
 
-export type SessionType = 'night' | 'morning';
-
-export interface ActivityMaster {
-  id: string;
-  activityName: string;
-  sessionType: SessionType;
-  startTime: string; // HH:mm WIB
-  endTime: string; // HH:mm WIB
-  description?: string;
-  isActive: boolean;
-}
-
 export interface ActivitySession {
   id: string;
   activityId?: string;
   activityName: string;
-  sessionType: SessionType;
+  sessionType: SessionType; // 'night' = Maghrib-Isya, 'morning' = Subuh-06.00 WIB
   activityDate: string; // YYYY-MM-DD
   startTime: string;
   endTime: string;

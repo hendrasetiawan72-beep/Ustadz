@@ -167,6 +167,7 @@ export const ImporExcelView: React.FC<ImporExcelViewProps> = ({
             await addPiketSchedule({
               ustadzId: u.id,
               scheduleDate: String(row.scheduleDate),
+              sessionType: 'both',
               status: 'terjadwal',
               notes: String(row.notes || ''),
               allowOverride: true,

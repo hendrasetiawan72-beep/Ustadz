@@ -136,11 +136,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
         <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <button
-            onClick={() => onNavigate('absensi_harian')}
-            className="px-4 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm flex items-center gap-2 transition-all hover:translate-y-[-1px]"
+            onClick={() => onNavigate('kegiatan_malam')}
+            className="px-4 py-2.5 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-xl shadow-sm flex items-center gap-2 transition-all hover:translate-y-[-1px]"
           >
-            <ClipboardList className="w-4 h-4" />
-            <span>Absensi Cepat</span>
+            <Moon className="w-4 h-4" />
+            <span>Absen Malam</span>
+          </button>
+          <button
+            onClick={() => onNavigate('kegiatan_pagi')}
+            className="px-4 py-2.5 text-xs font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-xl shadow-sm flex items-center gap-2 transition-all hover:translate-y-[-1px]"
+          >
+            <Sun className="w-4 h-4" />
+            <span>Absen Pagi</span>
           </button>
           <button
             onClick={() => onNavigate('jadwal_piket')}
@@ -153,7 +160,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             onClick={() => onNavigate('cetak_ekspor')}
             className="px-4 py-2.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2 transition-colors"
           >
-            <FileText className="w-4 h-4 text-purple-600" />
+            <FileText className="w-4 h-4 text-emerald-600" />
             <span>Cetak PDF</span>
           </button>
         </div>
@@ -164,7 +171,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         {/* Card 1: Ustadz Piket Hari Ini */}
         <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Ustadz Piket Hari Ini</span>
+            <span className="text-xs font-semibold text-slate-500">Ustadz/ah Piket Hari Ini</span>
             <div className="p-2 bg-emerald-100/70 text-emerald-700 rounded-xl">
               <CalendarCheck className="w-4 h-4" />
             </div>
@@ -375,10 +382,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           <div className="pt-4 border-t border-slate-100 mt-4">
             <button
-              onClick={() => onNavigate('absensi_harian')}
+              onClick={() => onNavigate('kegiatan_malam')}
               className="w-full py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl transition-colors text-center"
             >
-              Perbarui Absensi Santri
+              Isi Absensi Kegiatan Malam
             </button>
           </div>
         </div>

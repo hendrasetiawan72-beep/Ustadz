@@ -440,6 +440,7 @@ export async function getPiketSchedules(): Promise<PiketSchedule[]> {
           ustadzId: s.ustadz_id,
           ustadzName: s.ustadz?.full_name || 'Ustadz',
           scheduleDate: s.schedule_date,
+          sessionType: s.session_type || 'both',
           dayName: s.day_name || getDayIndoName(s.schedule_date),
           weekStart: s.week_start,
           status: s.status,
@@ -496,7 +497,7 @@ export async function addPiketSchedule(
     );
     if (hasConflict) {
       throw new Error(
-        `Ustadz ini sudah memiliki jadwal piket pada minggu yang sama (${existingDate}). Aturan Ponpes: 1 Ustadz hanya boleh piket 1 kali per minggu. Jika ada penggantian atau kebutuhan mendesak, berikan alasan pengecualian.`
+        `Ustadz/Ustadzah ini sudah memiliki jadwal piket pada minggu yang sama (${existingDate}). Aturan Ponpes: 1 Ustadz/Ustadzah hanya boleh piket 1 kali per minggu. Jika ada pergantian, beri alasan pengecualian.`
       );
     }
   }
@@ -510,13 +511,14 @@ export async function addPiketSchedule(
     ustadzId: schedule.ustadzId,
     ustadzName: ustadz?.fullName || schedule.ustadzName || 'Ustadz',
     scheduleDate: schedule.scheduleDate,
+    sessionType: schedule.sessionType || 'both',
     dayName,
     weekStart,
     status: schedule.status || 'terjadwal',
     notes: schedule.notes || '',
     overrideReason: schedule.overrideReason || '',
     substituteUstadzId: schedule.substituteUstadzId,
-    createdBy: schedule.createdBy || 'user-admin',
+    createdBy: schedule.createdBy || 'admin',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -531,6 +533,7 @@ export async function addPiketSchedule(
         id: newSchedule.id,
         ustadz_id: newSchedule.ustadzId,
         schedule_date: newSchedule.scheduleDate,
+        session_type: newSchedule.sessionType,
         day_name: newSchedule.dayName,
         week_start: newSchedule.weekStart,
         status: newSchedule.status,
@@ -546,11 +549,11 @@ export async function addPiketSchedule(
 
   await addAuditLog({
     actorId: schedule.createdBy || 'admin',
-    actorName: 'Pengelola Jadwal',
+    actorName: 'Admin Pondok',
     action: 'TAMBAH_JADWAL_PIKET',
     entityType: 'piket_schedule',
     entityId: newSchedule.id,
-    details: `Menetapkan jadwal piket: ${newSchedule.ustadzName} untuk hari ${newSchedule.dayName}, ${newSchedule.scheduleDate}.`,
+    details: `Menetapkan jadwal piket: ${newSchedule.ustadzName} (${newSchedule.sessionType === 'morning' ? 'Pagi' : newSchedule.sessionType === 'night' ? 'Malam' : 'Malam & Pagi'}) hari ${newSchedule.dayName}, ${newSchedule.scheduleDate}.`,
   });
 
   return newSchedule;

@@ -1,24 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Sun,
-  Plus,
-  BookOpen,
+  Save,
+  CheckCheck,
+  Search,
   CheckCircle2,
-  AlertTriangle,
   Printer,
   FileSpreadsheet,
-  ArrowRightLeft,
+  Clock,
+  BookOpen,
 } from 'lucide-react';
 import {
   ActivitySession,
   Ustadz,
   Santri,
   StudentAttendance,
-  UserRole,
   AppSettings,
   AttendanceStatus,
 } from '../types';
-import { addActivitySession, saveStudentAttendanceBatch } from '../lib/db';
+import {
+  addActivitySession,
+  saveStudentAttendanceBatch,
+} from '../lib/db';
 import { exportDataToExcel } from '../lib/excel';
 
 interface KegiatanPagiViewProps {
@@ -26,7 +29,6 @@ interface KegiatanPagiViewProps {
   ustadzList: Ustadz[];
   santriList: Santri[];
   attendances: StudentAttendance[];
-  userRole: UserRole;
   settings: AppSettings;
   onRefresh: () => void;
   onOpenReportModal: (type: 'absensi_pagi') => void;
@@ -37,96 +39,159 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
   ustadzList,
   santriList,
   attendances,
-  userRole,
   settings,
   onRefresh,
   onOpenReportModal,
 }) => {
-  const morningSessions = sessions.filter((s) => s.sessionType === 'morning');
-  const [selectedSession, setSelectedSession] = useState<ActivitySession | null>(
-    morningSessions[0] || null
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedUstadzId, setSelectedUstadzId] = useState(ustadzList[0]?.id || '');
+  const [topic, setTopic] = useState('Sholat Subuh Berjamaah & Kuliah Subuh');
+  const [incidentNotes, setIncidentNotes] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedSuccessMsg, setSavedSuccessMsg] = useState(false);
+
+  // In-memory attendance map for fast clicking
+  const [attendanceMap, setAttendanceMap] = useState<
+    Record<string, { status: AttendanceStatus; notes: string }>
+  >({});
+
+  // Active morning session for the selected date if exists
+  const existingSession = sessions.find(
+    (s) => s.sessionType === 'morning' && s.activityDate === selectedDate
   );
 
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0]);
-  const [formStartTime, setFormStartTime] = useState(settings.morningSessionStart || '04:30');
-  const [formEndTime, setFormEndTime] = useState(settings.morningSessionEnd || '06:00');
-  const [formActivityName, setFormActivityName] = useState(settings.morningSessionDefaultTitle);
-  const [formUstadzId, setFormUstadzId] = useState(ustadzList[0]?.id || '');
-  const [formTopic, setFormTopic] = useState('');
-  const [formIncidentNotes, setFormIncidentNotes] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Sync state when date or existing session changes
+  useEffect(() => {
+    if (existingSession) {
+      setSelectedUstadzId(existingSession.ustadzId);
+      setTopic(existingSession.topic || settings.morningSessionDefaultTitle);
+      setIncidentNotes(existingSession.incidentNotes || '');
 
-  // In-session attendance
-  const sessionAttendances = selectedSession
-    ? attendances.filter((a) => a.sessionId === selectedSession.id)
-    : [];
+      const sessionAtts = attendances.filter((a) => a.sessionId === existingSession.id);
+      const newMap: Record<string, { status: AttendanceStatus; notes: string }> = {};
 
-  // Comparison with night session of previous or same date
-  const counterpartNightSession = sessions.find(
-    (s) => s.sessionType === 'night' && s.activityDate === selectedSession?.activityDate
-  );
-
-  const handleCreateSession = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const u = ustadzList.find((u) => u.id === formUstadzId);
-    try {
-      setIsSubmitting(true);
-      const newSession = await addActivitySession({
-        sessionType: 'morning',
-        activityName: formActivityName,
-        activityDate: formDate,
-        startTime: formStartTime,
-        endTime: formEndTime,
-        ustadzId: formUstadzId,
-        ustadzName: u?.fullName || 'Ustadz',
-        topic: formTopic,
-        incidentNotes: formIncidentNotes,
-        status: 'selesai',
-        createdBy: userRole,
+      santriList.forEach((s) => {
+        const found = sessionAtts.find((a) => a.santriId === s.id);
+        if (found) {
+          newMap[s.id] = { status: found.attendanceStatus, notes: found.notes || '' };
+        } else {
+          newMap[s.id] = { status: 'hadir', notes: '' };
+        }
       });
+      setAttendanceMap(newMap);
+    } else {
+      // Default new state
+      setTopic(settings.morningSessionDefaultTitle);
+      setIncidentNotes('');
+      const defaultMap: Record<string, { status: AttendanceStatus; notes: string }> = {};
+      santriList.forEach((s) => {
+        defaultMap[s.id] = { status: 'hadir', notes: '' };
+      });
+      setAttendanceMap(defaultMap);
+    }
+    setSavedSuccessMsg(false);
+  }, [selectedDate, existingSession, santriList, attendances, settings]);
 
-      // Default attendance to Hadir
-      const defaultAttendances = santriList
-        .filter((s) => s.isActive)
-        .map((s) => ({
-          santriId: s.id,
-          attendanceStatus: 'hadir' as AttendanceStatus,
-          notes: '',
-        }));
+  const activeSantri = santriList.filter((s) => s.isActive);
+  const hadirCount = activeSantri.filter((s) => attendanceMap[s.id]?.status === 'hadir').length;
+  const izinCount = activeSantri.filter((s) => attendanceMap[s.id]?.status === 'izin').length;
+  const sakitCount = activeSantri.filter((s) => attendanceMap[s.id]?.status === 'sakit').length;
+  const alpaCount = activeSantri.filter((s) => attendanceMap[s.id]?.status === 'alpa').length;
 
-      await saveStudentAttendanceBatch(newSession.id, defaultAttendances, userRole);
+  const handleSetStatus = (santriId: string, status: AttendanceStatus) => {
+    setAttendanceMap((prev) => ({
+      ...prev,
+      [santriId]: { ...prev[santriId], status },
+    }));
+    setSavedSuccessMsg(false);
+  };
 
-      setIsAddModalOpen(false);
-      setSelectedSession(newSession);
+  const handleSetNotes = (santriId: string, notes: string) => {
+    setAttendanceMap((prev) => ({
+      ...prev,
+      [santriId]: { ...prev[santriId], notes },
+    }));
+    setSavedSuccessMsg(false);
+  };
+
+  const handleMarkAllHadir = () => {
+    setAttendanceMap((prev) => {
+      const next = { ...prev };
+      activeSantri.forEach((s) => {
+        next[s.id] = { ...next[s.id], status: 'hadir' };
+      });
+      return next;
+    });
+    setSavedSuccessMsg(false);
+  };
+
+  const handleSaveAttendance = async () => {
+    try {
+      setIsSaving(true);
+      const u = ustadzList.find((item) => item.id === selectedUstadzId);
+      const ustadzName = u?.fullName || 'Ustadz Piket';
+
+      let sessionId = existingSession?.id;
+
+      if (!sessionId) {
+        // Create session
+        const newSession = await addActivitySession({
+          sessionType: 'morning',
+          activityName: settings.morningSessionDefaultTitle,
+          activityDate: selectedDate,
+          startTime: settings.morningSessionStart,
+          endTime: settings.morningSessionEnd,
+          ustadzId: selectedUstadzId,
+          ustadzName,
+          topic,
+          incidentNotes,
+          status: 'selesai',
+          createdBy: 'admin',
+        });
+        sessionId = newSession.id;
+      }
+
+      // Save student attendance batch
+      const batchPayload = activeSantri.map((s) => ({
+        santriId: s.id,
+        attendanceStatus: attendanceMap[s.id]?.status || 'hadir',
+        notes: attendanceMap[s.id]?.notes || '',
+      }));
+
+      await saveStudentAttendanceBatch(sessionId, batchPayload, 'admin');
+
+      setSavedSuccessMsg(true);
       onRefresh();
+      setTimeout(() => setSavedSuccessMsg(false), 3000);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      alert(`Gagal membuat sesi kegiatan: ${msg}`);
+      alert(`Gagal menyimpan absensi: ${msg}`);
     } finally {
-      setIsSubmitting(false);
+      setIsSaving(false);
     }
   };
 
   const handleExportExcel = () => {
-    if (!selectedSession) return;
-    const santriMap = new Map(santriList.map((s) => [s.id, s]));
-    const data = sessionAttendances.map((a, idx) => {
-      const s = santriMap.get(a.santriId);
-      return {
-        No: idx + 1,
-        NIS: s?.studentNumber || '-',
-        Nama_Santri: s?.fullName || '-',
-        Kelas: s?.className || '-',
-        Asrama: s?.dormitory || '-',
-        Kegiatan: selectedSession.activityName,
-        Tanggal: selectedSession.activityDate,
-        Status_Kehadiran: a.attendanceStatus.toUpperCase(),
-        Keterangan: a.notes || '-',
-      };
-    });
-    exportDataToExcel(data, `Kegiatan_Pagi_${selectedSession.activityDate}`);
+    const data = activeSantri.map((s, idx) => ({
+      No: idx + 1,
+      NIS: s.studentNumber,
+      Nama_Santri: s.fullName,
+      Kelas: s.className,
+      Asrama: s.dormitory,
+      Tanggal: selectedDate,
+      Sesi: 'Pagi (Subuh - 06:00 WIB)',
+      Status: (attendanceMap[s.id]?.status || 'hadir').toUpperCase(),
+      Keterangan: attendanceMap[s.id]?.notes || '-',
+    }));
+    exportDataToExcel(data, `Absensi_Pagi_Ponpes_${selectedDate}`);
   };
+
+  const filteredSantri = activeSantri.filter((s) =>
+    s.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.studentNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.className.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
@@ -135,10 +200,10 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
         <div>
           <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
             <Sun className="w-5 h-5 text-orange-500" />
-            Kegiatan Pagi — Subuh sampai Pukul 06.00 WIB
+            Absensi Kegiatan Pagi (Subuh — 06.00 WIB)
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Rentang operasional: {settings.morningSessionStart} - {settings.morningSessionEnd} WIB &middot; Sholat Subuh Berjamaah & Kuliah Subuh
+            Pencatatan kehadiran sholat Subuh berjamaah, kuliah Subuh, dan muhadatsah bahasa
           </p>
         </div>
 
@@ -148,7 +213,7 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
             className="px-3 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-1.5 transition-colors"
           >
             <Printer className="w-3.5 h-3.5 text-slate-500" />
-            <span>PDF</span>
+            <span>Cetak PDF</span>
           </button>
 
           <button
@@ -156,277 +221,206 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
             className="px-3 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl flex items-center gap-1.5 transition-colors"
           >
             <FileSpreadsheet className="w-3.5 h-3.5" />
-            <span>Excel</span>
+            <span>Ekspor Excel</span>
           </button>
 
           <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="px-4 py-2 text-xs font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-xl shadow-xs flex items-center gap-1.5 transition-colors"
+            onClick={handleSaveAttendance}
+            disabled={isSaving}
+            className="px-4 py-2 text-xs font-bold text-white bg-orange-500 hover:bg-orange-600 disabled:opacity-50 rounded-xl shadow-xs flex items-center gap-1.5 transition-colors"
           >
-            <Plus className="w-4 h-4" />
-            <span>Catat Kegiatan Baru</span>
+            <Save className="w-4 h-4" />
+            <span>{isSaving ? 'Menyimpan...' : 'Simpan Absensi'}</span>
           </button>
         </div>
       </div>
 
-      {/* Main Grid: Sessions List & Details */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Col: Morning Sessions List */}
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+      {savedSuccessMsg && (
+        <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 text-emerald-800 text-xs font-semibold">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+          <span>Berhasil menyimpan absensi santri kegiatan pagi ke database!</span>
+        </div>
+      )}
+
+      {/* Control Session Bar (Date, Duty Ustadz, Topic) */}
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs space-y-4 text-xs">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <h3 className="font-bold text-slate-900 text-sm mb-3">Daftar Sesi Subuh & Pagi</h3>
-            <div className="space-y-2">
-              {morningSessions.map((sess) => {
-                const isSelected = selectedSession?.id === sess.id;
-                return (
-                  <button
-                    key={sess.id}
-                    onClick={() => setSelectedSession(sess)}
-                    className={`w-full text-left p-3 rounded-xl border transition-all text-xs ${
-                      isSelected
-                        ? 'border-orange-500 bg-orange-50/60 shadow-xs'
-                        : 'border-slate-200 hover:bg-slate-50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between font-mono text-[11px] text-slate-500">
-                      <span>{sess.activityDate}</span>
-                      <span className="font-semibold text-orange-600">
-                        {sess.startTime} - {sess.endTime} WIB
-                      </span>
-                    </div>
-                    <div className="font-bold text-slate-900 mt-1">{sess.activityName}</div>
-                    <div className="text-slate-600 mt-0.5 truncate">
-                      Piket: {sess.ustadzName}
-                    </div>
-                  </button>
-                );
-              })}
-              {morningSessions.length === 0 && (
-                <p className="text-xs text-slate-400 py-6 text-center">
-                  Belum ada sesi kegiatan pagi tercatat.
-                </p>
-              )}
-            </div>
+            <label className="block font-semibold text-slate-700 mb-1">
+              Tanggal Kegiatan
+            </label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="w-full border border-slate-300 rounded-xl px-3 py-2 font-mono bg-white text-slate-800"
+            />
+          </div>
+
+          <div>
+            <label className="block font-semibold text-slate-700 mb-1">
+              Ustadz / Ustadzah Piket Bertugas
+            </label>
+            <select
+              value={selectedUstadzId}
+              onChange={(e) => setSelectedUstadzId(e.target.value)}
+              className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-800 font-medium"
+            >
+              {ustadzList.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.fullName} ({u.employeeNumber})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-end">
+            <button
+              onClick={handleMarkAllHadir}
+              className="w-full py-2 bg-orange-50 hover:bg-orange-100 text-orange-950 border border-orange-200 font-bold rounded-xl flex items-center justify-center gap-2 transition-colors"
+            >
+              <CheckCheck className="w-4 h-4 text-orange-600" />
+              <span>Tandai Semua Santri Hadir</span>
+            </button>
           </div>
         </div>
 
-        {/* Right 2 Cols: Session Details */}
-        <div className="lg:col-span-2 space-y-4">
-          {selectedSession ? (
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs space-y-4">
-              <div className="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-orange-100 text-orange-800 uppercase">
-                    Kegiatan Pagi (Subuh)
-                  </span>
-                  <h3 className="text-lg font-bold text-slate-900 mt-1">
-                    {selectedSession.activityName}
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    {selectedSession.activityDate} &middot; {selectedSession.startTime} - {selectedSession.endTime} WIB &middot; Pembina: <span className="font-semibold text-slate-800">{selectedSession.ustadzName}</span>
-                  </p>
-                </div>
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+          <div>
+            <label className="block font-semibold text-slate-700 mb-1">
+              Materi Kuliah Subuh / Muhadatsah
+            </label>
+            <input
+              type="text"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              placeholder="Contoh: Kajian Hadits Arbain Nawawi & Mufrodat Yaumiyyah"
+              className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-800"
+            />
+          </div>
 
-              {/* Comparison Morning vs Night card */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <ArrowRightLeft className="w-4 h-4 text-emerald-600" />
-                  <span className="font-semibold text-slate-700">Perbandingan Kehadiran Sesi Pagi vs Malam:</span>
-                </div>
-                <div className="flex items-center gap-4 text-slate-800 font-mono">
-                  <span>🌅 Pagi: <strong className="text-emerald-700">{sessionAttendances.filter((a) => a.attendanceStatus === 'hadir').length} Hadir</strong></span>
-                  <span>🌙 Malam: <strong className="text-purple-700">{counterpartNightSession ? 'Tercatat' : 'Belum Ada'}</strong></span>
-                </div>
-              </div>
-
-              {/* Topics & Incident Notes */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <span className="font-semibold text-slate-700 block mb-1 flex items-center gap-1.5">
-                    <BookOpen className="w-3.5 h-3.5 text-orange-500" />
-                    Materi Kuliah Subuh / Muhadatsah:
-                  </span>
-                  <p className="text-slate-600">{selectedSession.topic || 'Belum diisi'}</p>
-                </div>
-
-                <div className="p-3 bg-amber-50/70 rounded-xl border border-amber-100">
-                  <span className="font-semibold text-amber-900 block mb-1 flex items-center gap-1.5">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                    Catatan Disiplin Bangun Subuh:
-                  </span>
-                  <p className="text-amber-800">{selectedSession.incidentNotes || 'Seluruh santri hadir tepat waktu sebelum adzan Subuh.'}</p>
-                </div>
-              </div>
-
-              {/* Attendance Table */}
-              <div className="mt-4">
-                <h4 className="font-bold text-slate-800 text-xs mb-2">
-                  Daftar Absensi Santri ({sessionAttendances.length} santri tercatat)
-                </h4>
-
-                <div className="border border-slate-200 rounded-xl overflow-hidden max-h-80 overflow-y-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-slate-600 sticky top-0 border-b border-slate-200">
-                      <tr>
-                        <th className="p-2.5">Nama Santri</th>
-                        <th className="p-2.5">Kelas</th>
-                        <th className="p-2.5 text-center">Status</th>
-                        <th className="p-2.5">Catatan</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {sessionAttendances.map((att) => {
-                        const s = santriList.find((santri) => santri.id === att.santriId);
-                        return (
-                          <tr key={att.id} className="hover:bg-slate-50">
-                            <td className="p-2.5 font-medium text-slate-900">{s?.fullName || 'Santri'}</td>
-                            <td className="p-2.5 text-slate-500">{s?.className || '-'}</td>
-                            <td className="p-2.5 text-center font-bold uppercase text-[10px]">
-                              <span
-                                className={`px-2 py-0.5 rounded-full ${
-                                  att.attendanceStatus === 'hadir'
-                                    ? 'bg-emerald-100 text-emerald-800'
-                                    : att.attendanceStatus === 'sakit'
-                                    ? 'bg-amber-100 text-amber-800'
-                                    : 'bg-rose-100 text-rose-800'
-                                }`}
-                              >
-                                {att.attendanceStatus}
-                              </span>
-                            </td>
-                            <td className="p-2.5 text-slate-500">{att.notes || '-'}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-12 text-center text-slate-400">
-              Pilih salah satu sesi di samping atau buat sesi kegiatan baru.
-            </div>
-          )}
+          <div>
+            <label className="block font-semibold text-slate-700 mb-1">
+              Catatan Kedisiplinan Bangun Subuh
+            </label>
+            <input
+              type="text"
+              value={incidentNotes}
+              onChange={(e) => setIncidentNotes(e.target.value)}
+              placeholder="Contoh: Seluruh santri bangun tepat waktu sebelum iqomah"
+              className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-800"
+            />
+          </div>
         </div>
       </div>
 
-      {/* Modal Add Session */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 border border-slate-200">
-            <h3 className="text-base font-bold text-slate-900 mb-1">
-              Catat Kegiatan Pagi (Subuh - 06:00 WIB)
-            </h3>
-            <p className="text-xs text-slate-500 mb-4">
-              Ponpes Baitul Arqom SMK Muhiba
-            </p>
-
-            <form onSubmit={handleCreateSession} className="space-y-3.5 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Tanggal</label>
-                  <input
-                    type="date"
-                    value={formDate}
-                    onChange={(e) => setFormDate(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl px-3 py-2 font-mono"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Ustadz Piket Bertugas</label>
-                  <select
-                    value={formUstadzId}
-                    onChange={(e) => setFormUstadzId(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white"
-                  >
-                    {ustadzList.map((u) => (
-                      <option key={u.id} value={u.id}>
-                        {u.fullName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Nama Kegiatan</label>
-                <input
-                  type="text"
-                  value={formActivityName}
-                  onChange={(e) => setFormActivityName(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Waktu Mulai</label>
-                  <input
-                    type="time"
-                    value={formStartTime}
-                    onChange={(e) => setFormStartTime(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl px-3 py-2 font-mono"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Waktu Selesai</label>
-                  <input
-                    type="time"
-                    value={formEndTime}
-                    onChange={(e) => setFormEndTime(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl px-3 py-2 font-mono"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Materi Kuliah Subuh / Kosakata Arab</label>
-                <input
-                  type="text"
-                  value={formTopic}
-                  onChange={(e) => setFormTopic(e.target.value)}
-                  placeholder="Contoh: Kajian Hadits Arbain & Mufrodat Yaumiyyah"
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Catatan Kejadian / Kedisiplinan</label>
-                <textarea
-                  rows={2}
-                  value={formIncidentNotes}
-                  onChange={(e) => setFormIncidentNotes(e.target.value)}
-                  placeholder="Catatan santri terlambat bangun atau tidak hadir sholat berjamaah"
-                  className="w-full border border-slate-300 rounded-xl p-2.5"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-semibold"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 text-white bg-orange-500 hover:bg-orange-600 rounded-xl font-bold shadow-xs"
-                >
-                  {isSubmitting ? 'Menyimpan...' : 'Simpan Kegiatan'}
-                </button>
-              </div>
-            </form>
-          </div>
+      {/* Counter Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="bg-emerald-50 border border-emerald-200/70 rounded-2xl p-3 text-center">
+          <span className="text-[11px] font-bold text-emerald-800 uppercase block">Hadir</span>
+          <span className="text-2xl font-extrabold text-emerald-700 font-mono tabular-nums">{hadirCount}</span>
         </div>
-      )}
+        <div className="bg-blue-50 border border-blue-200/70 rounded-2xl p-3 text-center">
+          <span className="text-[11px] font-bold text-blue-800 uppercase block">Izin</span>
+          <span className="text-2xl font-extrabold text-blue-700 font-mono tabular-nums">{izinCount}</span>
+        </div>
+        <div className="bg-amber-50 border border-amber-200/70 rounded-2xl p-3 text-center">
+          <span className="text-[11px] font-bold text-amber-800 uppercase block">Sakit</span>
+          <span className="text-2xl font-extrabold text-amber-700 font-mono tabular-nums">{sakitCount}</span>
+        </div>
+        <div className="bg-rose-50 border border-rose-200/70 rounded-2xl p-3 text-center">
+          <span className="text-[11px] font-bold text-rose-800 uppercase block">Alpa</span>
+          <span className="text-2xl font-extrabold text-rose-700 font-mono tabular-nums">{alpaCount}</span>
+        </div>
+      </div>
+
+      {/* Santri Attendance List */}
+      <div className="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+        {/* Search */}
+        <div className="p-3.5 border-b border-slate-100 flex items-center justify-between gap-3 text-xs">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari santri..."
+              className="w-full pl-9 pr-3 py-1.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white"
+            />
+          </div>
+          <span className="text-slate-400 font-mono">
+            {filteredSantri.length} Santri
+          </span>
+        </div>
+
+        {/* Rows */}
+        <div className="divide-y divide-slate-100">
+          {filteredSantri.map((s, idx) => {
+            const currentStatus = attendanceMap[s.id]?.status || 'hadir';
+            const currentNotes = attendanceMap[s.id]?.notes || '';
+
+            return (
+              <div
+                key={s.id}
+                className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/70 transition-colors"
+              >
+                <div className="flex items-center gap-3 min-w-[220px]">
+                  <span className="w-6 text-center text-slate-400 font-mono text-xs">{idx + 1}</span>
+                  <div>
+                    <h4 className="font-bold text-slate-900 text-xs md:text-sm">{s.fullName}</h4>
+                    <p className="text-[11px] text-slate-500 font-mono">
+                      {s.studentNumber} &middot; {s.className} &middot; {s.dormitory}
+                    </p>
+                  </div>
+                </div>
+
+                {/* 4 Simple Status Buttons */}
+                <div className="flex items-center gap-1.5">
+                  {(['hadir', 'izin', 'sakit', 'alpa'] as AttendanceStatus[]).map((st) => {
+                    const isSelected = currentStatus === st;
+                    return (
+                      <button
+                        key={st}
+                        onClick={() => handleSetStatus(s.id, st)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase transition-all ${
+                          isSelected
+                            ? st === 'hadir'
+                              ? 'bg-emerald-600 text-white shadow-xs'
+                              : st === 'izin'
+                              ? 'bg-blue-600 text-white shadow-xs'
+                              : st === 'sakit'
+                              ? 'bg-amber-600 text-white shadow-xs'
+                              : 'bg-rose-600 text-white shadow-xs'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        }`}
+                      >
+                        {st === 'hadir'
+                          ? 'Hadir'
+                          : st === 'izin'
+                          ? 'Izin'
+                          : st === 'sakit'
+                          ? 'Sakit'
+                          : 'Alpa'}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Note */}
+                <div className="sm:w-48">
+                  <input
+                    type="text"
+                    value={currentNotes}
+                    onChange={(e) => handleSetNotes(s.id, e.target.value)}
+                    placeholder="Catatan..."
+                    className="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white"
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };

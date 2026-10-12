@@ -2,49 +2,42 @@ import React from 'react';
 import {
   LayoutDashboard,
   CalendarDays,
-  GraduationCap,
-  Users,
-  ClipboardCheck,
   Moon,
   Sun,
   BarChart3,
+  GraduationCap,
+  Users,
   Printer,
   FileSpreadsheet,
   History,
   Settings,
-  ShieldCheck,
   X,
 } from 'lucide-react';
-import { UserRole } from '../types';
 
 export type NavigationTab =
   | 'dashboard'
   | 'jadwal_piket'
-  | 'data_ustadz'
-  | 'data_santri'
-  | 'absensi_harian'
   | 'kegiatan_malam'
   | 'kegiatan_pagi'
   | 'rekap_bulanan'
+  | 'data_ustadz'
+  | 'data_santri'
   | 'cetak_ekspor'
   | 'impor_excel'
   | 'riwayat_aktivitas'
-  | 'pengaturan'
-  | 'manajemen_pengguna';
+  | 'pengaturan';
 
 interface SidebarProps {
   currentTab: NavigationTab;
   onSelectTab: (tab: NavigationTab) => void;
   isOpen: boolean;
   onClose: () => void;
-  userRole: UserRole;
 }
 
 interface MenuItem {
   id: NavigationTab;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
-  roles: UserRole[];
   badge?: string;
   color: string;
 }
@@ -52,95 +45,72 @@ interface MenuItem {
 const MENU_ITEMS: MenuItem[] = [
   {
     id: 'dashboard',
-    label: 'Dashboard',
+    label: 'Dashboard Utama',
     icon: LayoutDashboard,
-    roles: ['admin', 'ustadz_piket', 'kepala_pengawas'],
     color: 'hover:bg-emerald-50 hover:text-emerald-700 text-slate-700',
   },
   {
     id: 'jadwal_piket',
-    label: 'Jadwal Piket Ustadz',
+    label: 'Jadwal Piket (Malam & Pagi)',
     icon: CalendarDays,
-    roles: ['admin', 'ustadz_piket', 'kepala_pengawas'],
+    badge: 'Ustadz/ah',
     color: 'hover:bg-blue-50 hover:text-blue-700 text-slate-700',
   },
   {
-    id: 'data_ustadz',
-    label: 'Data Ustadz',
-    icon: GraduationCap,
-    roles: ['admin', 'kepala_pengawas'],
-    color: 'hover:bg-indigo-50 hover:text-indigo-700 text-slate-700',
-  },
-  {
-    id: 'data_santri',
-    label: 'Data Santri',
-    icon: Users,
-    roles: ['admin', 'ustadz_piket', 'kepala_pengawas'],
-    color: 'hover:bg-teal-50 hover:text-teal-700 text-slate-700',
-  },
-  {
-    id: 'absensi_harian',
-    label: 'Absensi Santri Harian',
-    icon: ClipboardCheck,
-    roles: ['admin', 'ustadz_piket'],
-    badge: 'Harian',
-    color: 'hover:bg-amber-50 hover:text-amber-700 text-slate-700',
-  },
-  {
     id: 'kegiatan_malam',
-    label: 'Kegiatan Malam (Maghrib)',
+    label: 'Absen Kegiatan Malam',
     icon: Moon,
-    roles: ['admin', 'ustadz_piket'],
+    badge: 'Maghrib-Isya',
     color: 'hover:bg-purple-50 hover:text-purple-700 text-slate-700',
   },
   {
     id: 'kegiatan_pagi',
-    label: 'Kegiatan Pagi (Subuh)',
+    label: 'Absen Kegiatan Pagi',
     icon: Sun,
-    roles: ['admin', 'ustadz_piket'],
+    badge: 'Subuh-06.00',
     color: 'hover:bg-orange-50 hover:text-orange-700 text-slate-700',
   },
   {
     id: 'rekap_bulanan',
-    label: 'Rekap Bulanan',
+    label: 'Rekapitulasi Bulanan',
     icon: BarChart3,
-    roles: ['admin', 'ustadz_piket', 'kepala_pengawas'],
     color: 'hover:bg-emerald-50 hover:text-emerald-700 text-slate-700',
   },
   {
+    id: 'data_ustadz',
+    label: 'Data Ustadz & Ustadzah',
+    icon: GraduationCap,
+    color: 'hover:bg-indigo-50 hover:text-indigo-700 text-slate-700',
+  },
+  {
+    id: 'data_santri',
+    label: 'Data Santri Pesantren',
+    icon: Users,
+    color: 'hover:bg-teal-50 hover:text-teal-700 text-slate-700',
+  },
+  {
     id: 'cetak_ekspor',
-    label: 'Cetak dan Ekspor',
+    label: 'Cetak & Ekspor PDF Resmi',
     icon: Printer,
-    roles: ['admin', 'ustadz_piket', 'kepala_pengawas'],
-    badge: '12 Dokumen',
+    badge: '12 PDF',
     color: 'hover:bg-rose-50 hover:text-rose-700 text-slate-700',
   },
   {
     id: 'impor_excel',
-    label: 'Impor Excel',
+    label: 'Impor & Ekspor Excel',
     icon: FileSpreadsheet,
-    roles: ['admin'],
     color: 'hover:bg-green-50 hover:text-green-700 text-slate-700',
   },
   {
     id: 'riwayat_aktivitas',
     label: 'Riwayat Aktivitas',
     icon: History,
-    roles: ['admin', 'kepala_pengawas'],
     color: 'hover:bg-slate-100 hover:text-slate-800 text-slate-700',
   },
   {
     id: 'pengaturan',
-    label: 'Pengaturan Lembaga',
+    label: 'Pengaturan & Supabase',
     icon: Settings,
-    roles: ['admin'],
-    color: 'hover:bg-slate-100 hover:text-slate-800 text-slate-700',
-  },
-  {
-    id: 'manajemen_pengguna',
-    label: 'Manajemen Pengguna',
-    icon: ShieldCheck,
-    roles: ['admin'],
     color: 'hover:bg-slate-100 hover:text-slate-800 text-slate-700',
   },
 ];
@@ -150,10 +120,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectTab,
   isOpen,
   onClose,
-  userRole,
 }) => {
-  const visibleItems = MENU_ITEMS.filter((item) => item.roles.includes(userRole));
-
   return (
     <>
       {/* Mobile Backdrop */}
@@ -173,7 +140,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex flex-col h-full overflow-hidden">
           {/* Mobile Header in Sidebar */}
           <div className="flex items-center justify-between p-4 border-b border-slate-100 md:hidden">
-            <span className="font-bold text-slate-800 text-sm">Navigasi Utama</span>
+            <span className="font-bold text-slate-800 text-sm">Navigasi Admin</span>
             <button
               onClick={onClose}
               className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100"
@@ -185,9 +152,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Navigation Links List */}
           <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
             <div className="px-3 pb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
-              Menu Operasional
+              Menu Utama
             </div>
-            {visibleItems.map((item) => {
+            {MENU_ITEMS.map((item) => {
               const Icon = item.icon;
               const isActive = currentTab === item.id;
 
@@ -224,11 +191,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
           </div>
 
-          {/* Institution Footer in Sidebar */}
+          {/* Institution Footer */}
           <div className="p-4 border-t border-slate-100 bg-slate-50/70">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-black text-[10px] shadow-xs">
-                MA
+              <div className="w-7 h-7 rounded-lg bg-emerald-700 text-white flex items-center justify-center font-black text-[10px] shadow-xs">
+                BA
               </div>
               <div className="truncate">
                 <p className="text-xs font-bold text-slate-800 truncate">SMK Muhiba</p>

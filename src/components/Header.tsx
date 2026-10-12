@@ -1,18 +1,18 @@
 import React from 'react';
-import { Shield, Clock, UserCheck, Menu, Database } from 'lucide-react';
-import { UserRole, AppSettings } from '../types';
+import { Clock, ShieldCheck, LogOut, Menu, Database } from 'lucide-react';
+import { AppSettings, UserProfile } from '../types';
 
 interface HeaderProps {
-  currentRole: UserRole;
-  onRoleChange: (role: UserRole) => void;
+  currentUser: UserProfile;
+  onLogout: () => void;
   onToggleSidebar: () => void;
   settings: AppSettings;
   isSupabaseLive: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  currentRole,
-  onRoleChange,
+  currentUser,
+  onLogout,
   onToggleSidebar,
   settings,
   isSupabaseLive,
@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
   });
 
   return (
-    <header className="no-print h-16 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 md:px-8 flex items-center justify-between gap-4 sticky top-0 z-30">
+    <header className="no-print h-16 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 md:px-8 flex items-center justify-between gap-4 sticky top-0 z-30">
       {/* Zone 1: Brand title & Toggle */}
       <div className="flex items-center gap-3">
         <button
@@ -44,21 +44,25 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-emerald-50 border border-emerald-200/60 shrink-0">
+          <div className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center bg-emerald-50 border border-emerald-200/60 shrink-0 p-0.5 shadow-xs">
             <img
               src={settings.logoUrl}
               alt="Logo Muhiba"
               referrerPolicy="no-referrer"
               className="w-full h-full object-contain"
               onError={(e) => {
-                // Fallback
                 (e.target as HTMLElement).style.display = 'none';
               }}
             />
           </div>
-          <span className="font-bold text-slate-900 tracking-tight text-sm md:text-base whitespace-nowrap">
-            Ponpes Baitul Arqom
-          </span>
+          <div>
+            <span className="font-extrabold text-slate-900 tracking-tight text-sm md:text-base block leading-tight">
+              Ponpes Baitul Arqom
+            </span>
+            <span className="text-[10px] text-emerald-700 font-semibold uppercase tracking-wider block">
+              SMK Muhammadiyah 1 Babat
+            </span>
+          </div>
         </div>
       </div>
 
@@ -71,58 +75,37 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="font-mono tabular-nums font-semibold text-slate-800">{currentTimeWIB} WIB</span>
         </div>
 
-        <div className="flex items-center gap-1.5 text-[11px]">
-          <Database className="w-3.5 h-3.5 text-blue-500" />
+        <div className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-full">
+          <Database className="w-3 h-3 text-blue-500" />
           <span>Database:</span>
           <span className={`font-semibold ${isSupabaseLive ? 'text-emerald-600' : 'text-blue-600'}`}>
-            {isSupabaseLive ? 'Supabase Cloud' : 'Lokal (Siap Sinkron)'}
+            {isSupabaseLive ? 'Supabase Cloud' : 'Lokal Siap Sinkron'}
           </span>
         </div>
       </div>
 
-      {/* Zone 3: Role Switcher & User Profile */}
+      {/* Zone 3: Single Role (Admin) & Logout Action */}
       <div className="flex items-center gap-3 shrink-0">
-        <div className="flex items-center gap-2 bg-slate-100/90 p-1 rounded-xl border border-slate-200/60">
-          <div className="px-2 py-1 text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-            <Shield className="w-3 h-3 text-emerald-600" />
-            <span className="hidden sm:inline">Peran:</span>
+        <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
+          <ShieldCheck className="w-4 h-4 text-emerald-700" />
+          <div className="text-left hidden sm:block">
+            <span className="text-[11px] font-bold text-emerald-950 block leading-none">
+              Admin Pesantren
+            </span>
+            <span className="text-[10px] text-emerald-700 font-medium block truncate max-w-[130px]">
+              {currentUser.email}
+            </span>
           </div>
-
-          <button
-            onClick={() => onRoleChange('admin')}
-            className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all whitespace-nowrap ${
-              currentRole === 'admin'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Admin
-          </button>
-          <button
-            onClick={() => onRoleChange('ustadz_piket')}
-            className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all whitespace-nowrap ${
-              currentRole === 'ustadz_piket'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Ustadz Piket
-          </button>
-          <button
-            onClick={() => onRoleChange('kepala_pengawas')}
-            className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all whitespace-nowrap ${
-              currentRole === 'kepala_pengawas'
-                ? 'bg-purple-600 text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Pengawas
-          </button>
         </div>
 
-        <div className="w-8 h-8 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0 shadow-sm" title={`Aktif sebagai: ${currentRole}`}>
-          <UserCheck className="w-4 h-4" />
-        </div>
+        <button
+          onClick={onLogout}
+          title="Keluar dari Akun"
+          className="px-3 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl flex items-center gap-1.5 transition-colors"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Keluar</span>
+        </button>
       </div>
     </header>
   );

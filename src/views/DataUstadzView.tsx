@@ -123,10 +123,10 @@ export const DataUstadzView: React.FC<DataUstadzViewProps> = ({
         <div>
           <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
             <GraduationCap className="w-5 h-5 text-emerald-600" />
-            Data Ustadz & Pembina Piket
+            Data Ustadz & Ustadzah (Pembina Piket)
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Daftar dewan guru dan pembina piket Ponpes Baitul Arqom SMK Muhiba
+            Daftar dewan guru dan pembina piket putra & putri Ponpes Baitul Arqom SMK Muhiba
           </p>
         </div>
 

@@ -139,10 +139,16 @@ export async function generatePesantrenPDF(options: PDFReportOptions): Promise<j
   const ustadzMap = new Map((data.ustadzList || []).map((u) => [u.id, u]));
 
   if (reportType === 'jadwal_mingguan' || reportType === 'jadwal_bulanan') {
-    tableHeaders = ['No', 'Hari', 'Tanggal', 'Nama Ustadz Piket', 'NIP', 'Status Piket', 'Catatan'];
+    tableHeaders = ['No', 'Hari', 'Tanggal', 'Petugas Piket (Ustadz/ah)', 'Sesi Piket', 'NIP', 'Status', 'Catatan'];
     const schedules = data.schedules || [];
     tableRows = schedules.map((s, idx) => {
       const u = ustadzMap.get(s.ustadzId);
+      const sessionLabel =
+        s.sessionType === 'morning'
+          ? 'Pagi (Subuh)'
+          : s.sessionType === 'night'
+          ? 'Malam (Maghrib)'
+          : 'Malam & Pagi';
       const statusText =
         s.status === 'sudah_bertugas'
           ? 'Sudah Bertugas'
@@ -156,6 +162,7 @@ export async function generatePesantrenPDF(options: PDFReportOptions): Promise<j
         s.dayName,
         s.scheduleDate,
         s.ustadzName || u?.fullName || '-',
+        sessionLabel,
         u?.employeeNumber || '-',
         statusText,
         s.notes || (s.overrideReason ? `Pengecualian: ${s.overrideReason}` : '-'),

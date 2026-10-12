@@ -202,7 +202,8 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                     {reportType.includes('jadwal') ? (
                       <>
                         <th className="border border-slate-300 p-2 text-left">Hari / Tanggal</th>
-                        <th className="border border-slate-300 p-2 text-left">Nama Ustadz</th>
+                        <th className="border border-slate-300 p-2 text-left">Petugas Piket</th>
+                        <th className="border border-slate-300 p-2 text-center">Sesi</th>
                         <th className="border border-slate-300 p-2 text-center">Status</th>
                         <th className="border border-slate-300 p-2 text-left">Catatan</th>
                       </>
@@ -235,6 +236,9 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                             {s.dayName}, {s.scheduleDate}
                           </td>
                           <td className="border border-slate-300 p-2">{s.ustadzName}</td>
+                          <td className="border border-slate-300 p-2 text-center font-semibold text-[10px]">
+                            {s.sessionType === 'morning' ? 'Pagi (Subuh)' : s.sessionType === 'night' ? 'Malam' : 'Malam & Pagi'}
+                          </td>
                           <td className="border border-slate-300 p-2 text-center uppercase font-semibold text-[10px]">
                             {s.status.replace('_', ' ')}
                           </td>
@@ -243,7 +247,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={5} className="p-4 text-center text-slate-500">
+                        <td colSpan={6} className="p-4 text-center text-slate-500">
                           Data jadwal belum tersedia
                         </td>
                       </tr>
