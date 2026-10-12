@@ -14,6 +14,7 @@ import {
   PanelLeftClose,
   X,
 } from 'lucide-react';
+import { OFFICIAL_LOGO_URL } from '../lib/constants';
 
 export type NavigationTab =
   | 'dashboard'
@@ -206,8 +207,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Institution Footer */}
           <div className="p-3.5 border-t border-slate-100 bg-slate-50/70">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-7 h-7 rounded-lg bg-emerald-700 text-white flex items-center justify-center font-black text-[10px] shrink-0 shadow-xs">
-                BA
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200/70 p-0.5 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
+                <img
+                  src={OFFICIAL_LOGO_URL}
+                  alt="Logo SMK Muhiba"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-bold text-slate-800 truncate">SMK Muhiba</p>

@@ -157,40 +157,41 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
             </div>
 
             <div className="md:col-span-2">
-              <label className="block font-semibold text-slate-700 mb-1">
-                URL Logo Resmi
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block font-semibold text-slate-700">
+                  Logo Resmi Pesantren & Sekolah
+                </label>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                  Terkunci di Seluruh Aplikasi
+                </span>
+              </div>
               <div className="flex gap-2">
                 <input
                   type="text"
-                  value={formSettings.logoUrl}
-                  onChange={(e) => setFormSettings({ ...formSettings, logoUrl: e.target.value })}
-                  className="flex-1 border border-slate-300 rounded-xl px-3 py-2 font-mono text-[11px]"
-                  required
+                  value={OFFICIAL_LOGO_URL}
+                  readOnly
+                  disabled
+                  className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-mono text-[11px] text-slate-500 cursor-not-allowed select-all"
                 />
-                <button
-                  type="button"
-                  onClick={handleResetLogo}
-                  className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs"
-                >
-                  Reset ke Logo Asli
-                </button>
               </div>
 
               {/* Logo Preview */}
-              <div className="mt-3 flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-200/80">
-                <div className="w-16 h-16 rounded-xl bg-white border border-slate-200 flex items-center justify-center p-1 overflow-hidden shrink-0">
+              <div className="mt-3 flex items-center gap-4 p-3.5 bg-slate-50 rounded-2xl border border-emerald-200/60 shadow-2xs">
+                <div className="w-16 h-16 rounded-xl bg-white border border-slate-200/80 flex items-center justify-center p-1.5 overflow-hidden shrink-0 shadow-xs">
                   <img
-                    src={formSettings.logoUrl}
-                    alt="Logo Preview"
+                    src={OFFICIAL_LOGO_URL}
+                    alt="Logo Resmi Ponpes Baitul Arqom SMK Muhiba"
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-contain"
                   />
                 </div>
                 <div>
-                  <span className="font-bold text-slate-800 block text-xs">Pratinjau Logo Aktif</span>
-                  <span className="text-[11px] text-slate-500">
-                    Logo ini dicetak di seluruh kop surat formal dokumen PDF dan tampilan layar.
+                  <span className="font-bold text-slate-800 block text-xs">
+                    Logo Resmi Terkunci (SMK Muhammadiyah Bawang)
+                  </span>
+                  <span className="text-[11px] text-slate-500 block mt-0.5">
+                    Logo ini terkunci aktif secara serentak di bilah atas (header), bilah navigasi samping, halaman login, kop surat dinas, pratinjau, dan ekspor cetak PDF.
                   </span>
                 </div>
               </div>

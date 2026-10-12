@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { AppSettings, ReportType, Ustadz, Santri, PiketSchedule, ActivitySession, StudentAttendance } from '../types';
+import { OFFICIAL_LOGO_URL } from './constants';
 
 export interface PDFReportOptions {
   reportType: ReportType;
@@ -21,6 +22,37 @@ export interface PDFReportOptions {
 
 // Convert image url to base64 for jsPDF
 export async function getBase64ImageFromUrl(imageUrl: string): Promise<string | null> {
+  if (!imageUrl) return null;
+  // First attempt: HTMLImageElement with canvas
+  try {
+    const base64 = await new Promise<string | null>((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth || 200;
+          canvas.height = img.naturalHeight || 200;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas.toDataURL('image/jpeg', 0.95));
+            return;
+          }
+        } catch {
+          // canvas tainted or error
+        }
+        resolve(null);
+      };
+      img.onerror = () => resolve(null);
+      img.src = imageUrl;
+    });
+    if (base64) return base64;
+  } catch {
+    // ignore
+  }
+
+  // Second attempt: fetch blob
   try {
     const res = await fetch(imageUrl, { mode: 'cors' });
     const blob = await res.blob();
@@ -33,7 +65,7 @@ export async function getBase64ImageFromUrl(imageUrl: string): Promise<string | 
       reader.readAsDataURL(blob);
     });
   } catch (e) {
-    console.warn('Could not convert image to base64 for PDF, using fallback vector mark:', e);
+    console.warn('Could not convert image to base64 for PDF, using vector fallback mark:', e);
     return null;
   }
 }
@@ -62,7 +94,7 @@ export async function generatePesantrenPDF(options: PDFReportOptions): Promise<j
   const printableWidth = pageWidth - marginLeft - marginRight;
 
   // Try fetching logo
-  const logoBase64 = await getBase64ImageFromUrl(settings.logoUrl);
+  const logoBase64 = await getBase64ImageFromUrl(settings.logoUrl || OFFICIAL_LOGO_URL);
 
   // Function to draw Kop Surat on page
   const drawKopSurat = (yStart: number) => {

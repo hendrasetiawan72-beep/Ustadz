@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, ShieldCheck, LogOut, PanelLeftClose, PanelLeft, Database } from 'lucide-react';
 import { AppSettings, UserProfile } from '../types';
+import { OFFICIAL_LOGO_URL } from '../lib/constants';
 
 interface HeaderProps {
   currentUser: UserProfile;
@@ -53,13 +54,10 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center bg-emerald-50 border border-emerald-200/60 shrink-0 p-0.5 shadow-xs">
             <img
-              src={settings.logoUrl}
+              src={settings.logoUrl || OFFICIAL_LOGO_URL}
               alt="Logo Muhiba"
               referrerPolicy="no-referrer"
               className="w-full h-full object-contain"
-              onError={(e) => {
-                (e.target as HTMLElement).style.display = 'none';
-              }}
             />
           </div>
           <div className="min-w-0">

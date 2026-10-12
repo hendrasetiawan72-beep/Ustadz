@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, Mail, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
 import { UserProfile, AppSettings } from '../types';
-import { DEFAULT_ADMIN } from '../lib/constants';
+import { DEFAULT_ADMIN, OFFICIAL_LOGO_URL } from '../lib/constants';
 
 interface LoginFormProps {
   settings: AppSettings;
@@ -59,13 +59,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
         <div className="p-8 pb-6 text-center border-b border-slate-100 bg-white">
           <div className="w-20 h-20 mx-auto rounded-2xl bg-emerald-50 border border-emerald-200/70 p-2 flex items-center justify-center mb-4 shadow-xs">
             <img
-              src={settings.logoUrl}
+              src={settings.logoUrl || OFFICIAL_LOGO_URL}
               alt="Logo Resmi Ponpes Baitul Arqom SMK Muhiba"
               referrerPolicy="no-referrer"
               className="w-full h-full object-contain"
-              onError={(e) => {
-                (e.target as HTMLElement).style.display = 'none';
-              }}
             />
           </div>
 

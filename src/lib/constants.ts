@@ -1,6 +1,6 @@
 import { AppSettings, Ustadz, Santri, PiketSchedule, ActivitySession, StudentAttendance, AuditLog, UserProfile } from '../types';
 
-export const OFFICIAL_LOGO_URL = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiAYTmhJlWEYwE9QBmw37zoslhqCo90hAtJ4c2Nk6yGXvojklwqPR9E19OVqQxMha2HO6aWrDP1cCdfuXA1m0ViCS73bq5qrrMdtUtplJzc6217uJFTu9Sm-yqU7ZzSNeXwmFS0lVid02IhAPrxI4n0bS10I9WzbDhKYOcpbHypygt646fCspHvud7AobY0B/s640/44709.jpg';
+export const OFFICIAL_LOGO_URL = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiAYTmhJlYOEw9QBmw37zoslhqCo90hAtJ4c2Nk6yGXvojklwqPR9E19OVqQxMha2HO6aWrDP1cCdfuXA1m0ViCS73bq5qrrMdtUtplJzc6217uJFTu9Sm-yqU7ZzSNeXwmFS0lVid02IhAPrxI4n0bS10I9WzbDhKYOcpbHypygt646fCspHvud7AobY0B/s640/44709.jpg';
 
 export const DEFAULT_SETTINGS: AppSettings = {
   id: 'setting-default',

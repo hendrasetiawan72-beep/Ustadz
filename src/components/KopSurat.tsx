@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AppSettings } from '../types';
+import { OFFICIAL_LOGO_URL } from '../lib/constants';
 
 interface KopSuratProps {
   settings: AppSettings;
@@ -26,9 +27,9 @@ export const KopSurat: React.FC<KopSuratProps> = ({
       <div className="flex items-center gap-3 sm:gap-6 pb-3">
         {/* Logo Resmi Lembaga */}
         <div className="shrink-0 flex items-center justify-center">
-          {!imageError && settings.logoUrl ? (
+          {!imageError ? (
             <img
-              src={settings.logoUrl}
+              src={settings.logoUrl || OFFICIAL_LOGO_URL}
               alt="Logo Resmi Ponpes Baitul Arqom SMK Muhiba"
               referrerPolicy="no-referrer"
               className="h-18 w-18 sm:h-22 sm:w-22 object-contain"

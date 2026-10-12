@@ -10,6 +10,7 @@ import {
 } from '../types';
 import {
   DEFAULT_SETTINGS,
+  OFFICIAL_LOGO_URL,
   INITIAL_USTADZ,
   INITIAL_SANTRI,
   INITIAL_SCHEDULES,
@@ -63,7 +64,7 @@ export async function getAppSettings(): Promise<AppSettings> {
           id: data.id,
           institutionName: data.institution_name,
           subTitle: data.sub_title || DEFAULT_SETTINGS.subTitle,
-          logoUrl: data.logo_url || DEFAULT_SETTINGS.logoUrl,
+          logoUrl: OFFICIAL_LOGO_URL,
           address: data.address || DEFAULT_SETTINGS.address,
           phone: data.phone || DEFAULT_SETTINGS.phone,
           email: data.email || DEFAULT_SETTINGS.email,
@@ -87,12 +88,18 @@ export async function getAppSettings(): Promise<AppSettings> {
       // fallback to local
     }
   }
-  return loadLocal<AppSettings>(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+  const local = loadLocal<AppSettings>(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+  return {
+    ...local,
+    institutionName: local.institutionName || DEFAULT_SETTINGS.institutionName,
+    subTitle: local.subTitle || DEFAULT_SETTINGS.subTitle,
+    logoUrl: OFFICIAL_LOGO_URL, // Terkunci permanen dengan logo resmi
+  };
 }
 
 export async function updateAppSettings(settings: Partial<AppSettings>): Promise<AppSettings> {
   const current = await getAppSettings();
-  const updated: AppSettings = { ...current, ...settings };
+  const updated: AppSettings = { ...current, ...settings, logoUrl: OFFICIAL_LOGO_URL };
   saveLocal(STORAGE_KEYS.SETTINGS, updated);
 
   const supabase = getSupabaseClient();
