@@ -1,0 +1,6 @@
+{
+  "name": "Absensi Piket Ponpes Baitul Arqom SMK Muhiba",
+  "description": "Sistem Informasi Absensi Piket Ustadz & Santri Ponpes Baitul Arqom SMK Muhiba dengan jadwal mingguan, absensi kegiatan subuh & maghrib, rekap bulanan, impor Excel, cetak PDF resmi, dan database Supabase.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
