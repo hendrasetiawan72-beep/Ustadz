@@ -261,8 +261,8 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
 
       {/* Schedule Table */}
       <div className="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left text-xs min-w-[700px]">
             <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
               <tr>
                 <th className="py-3 px-4 font-semibold">Hari & Tanggal</th>
@@ -299,8 +299,8 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
                       </div>
                     </td>
 
-                    <td className="py-3.5 px-4">
-                      <div className="font-bold text-slate-900">{sch.ustadzName}</div>
+                    <td className="py-3.5 px-4 min-w-[180px]">
+                      <div className="font-bold text-slate-900 break-words">{sch.ustadzName}</div>
                       <div className="text-[11px] text-slate-400">Pekan: {sch.weekStart}</div>
                     </td>
 
@@ -340,10 +340,10 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
                       </button>
                     </td>
 
-                    <td className="py-3.5 px-4 text-slate-600 max-w-xs truncate">
-                      {sch.notes || '-'}
+                    <td className="py-3.5 px-4 text-slate-600 max-w-xs">
+                      <div className="truncate" title={sch.notes || ''}>{sch.notes || '-'}</div>
                       {sch.overrideReason && (
-                        <span className="block text-[10px] text-amber-700 font-semibold">
+                        <span className="block text-[10px] text-amber-700 font-semibold truncate" title={sch.overrideReason}>
                           Alasan: {sch.overrideReason}
                         </span>
                       )}

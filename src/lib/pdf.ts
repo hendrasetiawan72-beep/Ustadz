@@ -83,26 +83,32 @@ export async function generatePesantrenPDF(options: PDFReportOptions): Promise<j
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
     doc.setTextColor(15, 23, 42); // slate-900
-    doc.text(settings.institutionName, textCenterX, yStart + 5, { align: 'center' });
+    doc.text(settings.institutionName || 'PONPES BAITUL ARQOM SMK MUHIBA', textCenterX, yStart + 5, { align: 'center' });
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(51, 65, 85); // slate-700
-    doc.text(settings.subTitle, textCenterX, yStart + 10, { align: 'center' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(30, 41, 59); // slate-800
+    doc.text(settings.subTitle || 'SMK MUHAMMADIYAH BAWANG', textCenterX, yStart + 10, { align: 'center' });
 
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139); // slate-500
-    doc.text(`${settings.address} | Telp: ${settings.phone}`, textCenterX, yStart + 14, { align: 'center' });
+    let currentY = yStart + 11;
+    if (settings.address || settings.phone || settings.email) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139); // slate-500
+      const contactParts = [settings.address, settings.phone ? `Telp/WA: ${settings.phone}` : '', settings.email ? `Email: ${settings.email}` : ''].filter(Boolean);
+      doc.text(contactParts.join(' | '), textCenterX, yStart + 14, { align: 'center' });
+      currentY = yStart + 16;
+    }
 
-    // Double divider line
-    const lineY = yStart + 22;
-    doc.setDrawColor(30, 41, 59);
-    doc.setLineWidth(0.7);
+    // Double divider line (Formal standard)
+    const lineY = Math.max(currentY + 4, yStart + 22);
+    doc.setDrawColor(15, 23, 42);
+    doc.setLineWidth(0.8);
     doc.line(marginLeft, lineY, pageWidth - marginRight, lineY);
-    doc.setLineWidth(0.2);
-    doc.line(marginLeft, lineY + 1, pageWidth - marginRight, lineY + 1);
+    doc.setLineWidth(0.25);
+    doc.line(marginLeft, lineY + 1.2, pageWidth - marginRight, lineY + 1.2);
 
-    return lineY + 5;
+    return lineY + 6;
   };
 
   const drawFallbackLogo = (yStart: number) => {

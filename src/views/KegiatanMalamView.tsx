@@ -368,18 +368,20 @@ export const KegiatanMalamView: React.FC<KegiatanMalamViewProps> = ({
                 key={s.id}
                 className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/70 transition-colors"
               >
-                <div className="flex items-center gap-3 min-w-[220px]">
-                  <span className="w-6 text-center text-slate-400 font-mono text-xs">{idx + 1}</span>
-                  <div>
-                    <h4 className="font-bold text-slate-900 text-xs md:text-sm">{s.fullName}</h4>
-                    <p className="text-[11px] text-slate-500 font-mono">
+                <div className="flex items-center gap-3 min-w-0 flex-1 sm:flex-initial sm:min-w-[220px]">
+                  <span className="w-6 text-center text-slate-400 font-mono text-xs shrink-0">{idx + 1}</span>
+                  <div className="min-w-0">
+                    <h4 className="font-bold text-slate-900 text-xs md:text-sm truncate" title={s.fullName}>
+                      {s.fullName}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 font-mono truncate">
                       {s.studentNumber} &middot; {s.className} &middot; {s.dormitory}
                     </p>
                   </div>
                 </div>
 
                 {/* 4 Simple Status Buttons */}
-                <div className="flex items-center gap-1.5">
+                <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                   {(['hadir', 'izin', 'sakit', 'alpa'] as AttendanceStatus[]).map((st) => {
                     const isSelected = currentStatus === st;
                     return (
@@ -411,7 +413,7 @@ export const KegiatanMalamView: React.FC<KegiatanMalamViewProps> = ({
                 </div>
 
                 {/* Note */}
-                <div className="sm:w-48">
+                <div className="w-full sm:w-44 shrink-0">
                   <input
                     type="text"
                     value={currentNotes}

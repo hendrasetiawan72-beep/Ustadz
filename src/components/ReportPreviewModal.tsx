@@ -194,8 +194,8 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
             />
 
             {/* Document Content Table */}
-            <div className="mt-4">
-              <table className="w-full border-collapse border border-slate-300 text-xs">
+            <div className="mt-4 overflow-x-auto w-full">
+              <table className="w-full border-collapse border border-slate-300 text-xs min-w-[520px]">
                 <thead>
                   <tr className="bg-slate-100 text-slate-800 border-b border-slate-300">
                     <th className="border border-slate-300 p-2 text-center w-10">No</th>

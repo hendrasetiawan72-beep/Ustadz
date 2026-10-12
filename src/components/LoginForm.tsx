@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, Mail, Eye, EyeOff, LogIn, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
 import { UserProfile, AppSettings } from '../types';
 import { DEFAULT_ADMIN } from '../lib/constants';
 
@@ -9,7 +9,7 @@ interface LoginFormProps {
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }) => {
-  const [email, setEmail] = useState('admin@smkmuhiba.sch.id');
+  const [email, setEmail] = useState('admin@muhiba.sch.id');
   const [password, setPassword] = useState('admin123');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -20,7 +20,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
     setErrorMessage('');
     setIsLoading(true);
 
-    // Simple validation: accepts default credentials, user's email, or any valid email with password min 4 chars
     setTimeout(() => {
       const cleanEmail = email.trim().toLowerCase();
       if (!cleanEmail || !cleanEmail.includes('@')) {
@@ -38,13 +37,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
       const user: UserProfile = {
         ...DEFAULT_ADMIN,
         email: cleanEmail,
-        fullName: cleanEmail.includes('hendra') ? 'Hendra Setiawan (Admin)' : 'Administrator Ponpes Baitul Arqom',
+        fullName: 'Administrator Pesantren',
       };
 
       localStorage.setItem('ponpes_auth_user', JSON.stringify(user));
       setIsLoading(false);
       onLoginSuccess(user);
-    }, 400);
+    }, 300);
   };
 
   const handleQuickFill = (targetEmail: string) => {
@@ -54,9 +53,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50/50 to-slate-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-200/90 overflow-hidden">
-        {/* Top Header Card */}
+        {/* Top Header Card with Logo and Clean Institution Name */}
         <div className="p-8 pb-6 text-center border-b border-slate-100 bg-white">
           <div className="w-20 h-20 mx-auto rounded-2xl bg-emerald-50 border border-emerald-200/70 p-2 flex items-center justify-center mb-4 shadow-xs">
             <img
@@ -71,18 +70,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
           </div>
 
           <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 uppercase tracking-wider inline-block mb-1.5">
-            Portal Admin Pesantren
+            Login Sistem Absensi Piket
           </span>
 
-          <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">
-            {settings.institutionName}
+          <h1 className="text-lg sm:text-xl font-black text-slate-950 uppercase tracking-wide">
+            {settings.institutionName || 'PONPES BAITUL ARQOM SMK MUHIBA'}
           </h1>
+          <h2 className="text-xs sm:text-sm font-extrabold text-emerald-800 uppercase tracking-wider mt-0.5">
+            {settings.subTitle || 'SMK MUHAMMADIYAH BAWANG'}
+          </h2>
           <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
             Sistem Absensi Piket Ustadz & Santri — Kegiatan Malam & Pagi
           </p>
         </div>
 
-        {/* Form Body */}
+        {/* Form Body: Simple Email & Password */}
         <div className="p-8 pt-6">
           {errorMessage && (
             <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs flex items-center gap-2">
@@ -103,7 +105,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@smkmuhiba.sch.id"
+                  placeholder="admin@muhiba.sch.id"
                   className="w-full pl-10 pr-3.5 py-2.5 border border-slate-300 rounded-xl bg-slate-50/50 focus:bg-white focus:outline-emerald-500 text-slate-900 text-xs"
                   required
                 />
@@ -139,10 +141,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] disabled:opacity-50 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 transition-all text-xs"
+              className="w-full mt-2 py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] disabled:opacity-50 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 transition-all text-xs cursor-pointer"
             >
               {isLoading ? (
-                <span>Memverifikasi Masuk...</span>
+                <span>Memverifikasi...</span>
               ) : (
                 <>
                   <LogIn className="w-4 h-4" />
@@ -155,26 +157,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
           {/* Quick Login Helper */}
           <div className="mt-6 pt-5 border-t border-slate-100 text-center">
             <span className="text-[11px] text-slate-400 block mb-2">
-              Akses Cepat Login Akun:
+              Akun Cepat Admin:
             </span>
             <div className="flex flex-wrap items-center justify-center gap-2">
               <button
                 type="button"
-                onClick={() => handleQuickFill('admin@smkmuhiba.sch.id')}
-                className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-[11px] transition-colors"
+                onClick={() => handleQuickFill('admin@muhiba.sch.id')}
+                className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold rounded-lg text-[11px] transition-colors border border-emerald-200/60"
               >
-                admin@smkmuhiba.sch.id
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickFill('hendrasetiawan72@guru.smk.belajar.id')}
-                className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold rounded-lg text-[11px] transition-colors"
-              >
-                Akun Guru Belajar.id
+                admin@muhiba.sch.id (Klik Cepat)
               </button>
             </div>
             <p className="text-[10px] text-slate-400 mt-2 font-mono">
-              Password default: admin123
+              Password: admin123
             </p>
           </div>
         </div>

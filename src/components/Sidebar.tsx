@@ -11,6 +11,7 @@ import {
   FileSpreadsheet,
   History,
   Settings,
+  PanelLeftClose,
   X,
 } from 'lucide-react';
 
@@ -32,6 +33,7 @@ interface SidebarProps {
   onSelectTab: (tab: NavigationTab) => void;
   isOpen: boolean;
   onClose: () => void;
+  onToggleCollapse?: () => void;
 }
 
 interface MenuItem {
@@ -68,7 +70,7 @@ const MENU_ITEMS: MenuItem[] = [
     label: 'Absen Kegiatan Pagi',
     icon: Sun,
     badge: 'Subuh-06.00',
-    color: 'hover:bg-orange-50 hover:text-orange-700 text-slate-700',
+    color: 'hover:bg-amber-50 hover:text-amber-700 text-slate-700',
   },
   {
     id: 'rekap_bulanan',
@@ -90,9 +92,9 @@ const MENU_ITEMS: MenuItem[] = [
   },
   {
     id: 'cetak_ekspor',
-    label: 'Cetak & Ekspor PDF Resmi',
+    label: 'Cetak & Ekspor PDF',
     icon: Printer,
-    badge: '12 PDF',
+    badge: '12 Dokumen',
     color: 'hover:bg-rose-50 hover:text-rose-700 text-slate-700',
   },
   {
@@ -120,6 +122,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectTab,
   isOpen,
   onClose,
+  onToggleCollapse,
 }) => {
   return (
     <>
@@ -131,28 +134,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      {/* Sidebar Container */}
+      {/* Sidebar Container: can be hidden on desktop as well as mobile! */}
       <aside
-        className={`no-print fixed md:static inset-y-0 left-0 z-40 w-68 bg-white border-r border-slate-200/80 flex flex-col justify-between transition-transform duration-200 ease-in-out md:translate-x-0 ${
-          isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:shadow-none'
+        className={`no-print fixed md:static inset-y-0 left-0 z-40 bg-white border-r border-slate-200/80 flex flex-col justify-between transition-all duration-300 ease-in-out shrink-0 ${
+          isOpen
+            ? 'w-68 translate-x-0 opacity-100 shadow-2xl md:shadow-none'
+            : '-translate-x-full md:translate-x-0 md:w-0 md:opacity-0 md:-ml-0 overflow-hidden pointer-events-none md:border-r-0'
         }`}
       >
-        <div className="flex flex-col h-full overflow-hidden">
-          {/* Mobile Header in Sidebar */}
-          <div className="flex items-center justify-between p-4 border-b border-slate-100 md:hidden">
-            <span className="font-bold text-slate-800 text-sm">Navigasi Admin</span>
+        <div className="flex flex-col h-full w-68 overflow-hidden">
+          {/* Header in Sidebar with Hide Toggle */}
+          <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-100">
+            <span className="font-bold text-slate-800 text-xs uppercase tracking-wider">
+              Menu Navigasi
+            </span>
             <button
-              onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100"
+              onClick={onToggleCollapse || onClose}
+              title="Sembunyikan bilah samping"
+              className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors flex items-center gap-1 text-[11px]"
             >
-              <X className="w-5 h-5" />
+              <PanelLeftClose className="w-4 h-4" />
+              <span className="hidden sm:inline text-[10px]">Tutup</span>
             </button>
           </div>
 
           {/* Navigation Links List */}
-          <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-            <div className="px-3 pb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
-              Menu Utama
+          <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+            <div className="px-3 pb-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+              Menu Utama Admin
             </div>
             {MENU_ITEMS.map((item) => {
               const Icon = item.icon;
@@ -163,23 +172,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   key={item.id}
                   onClick={() => {
                     onSelectTab(item.id);
-                    onClose();
+                    // On small screens, close after click
+                    if (window.innerWidth < 768) {
+                      onClose();
+                    }
                   }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
                     isActive
                       ? 'bg-emerald-600 text-white shadow-sm font-bold'
                       : item.color
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
-                    <span className="truncate">{item.label}</span>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                    <span className="truncate text-left">{item.label}</span>
                   </div>
                   {item.badge && (
                     <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                      className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium shrink-0 ml-1.5 ${
                         isActive
-                          ? 'bg-emerald-700/60 text-white'
+                          ? 'bg-emerald-700 text-white'
                           : 'bg-slate-100 text-slate-600'
                       }`}
                     >
@@ -192,14 +204,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* Institution Footer */}
-          <div className="p-4 border-t border-slate-100 bg-slate-50/70">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-emerald-700 text-white flex items-center justify-center font-black text-[10px] shadow-xs">
+          <div className="p-3.5 border-t border-slate-100 bg-slate-50/70">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-emerald-700 text-white flex items-center justify-center font-black text-[10px] shrink-0 shadow-xs">
                 BA
               </div>
-              <div className="truncate">
+              <div className="min-w-0">
                 <p className="text-xs font-bold text-slate-800 truncate">SMK Muhiba</p>
-                <p className="text-[10px] text-slate-500 truncate">Ponpes Baitul Arqom</p>
+                <p className="text-[10px] text-slate-500 truncate">SMK Muhammadiyah Bawang</p>
               </div>
             </div>
           </div>

@@ -282,8 +282,8 @@ export const RekapBulananView: React.FC<RekapBulananViewProps> = ({
       {/* Main Tab Content */}
       <div className="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
         {activeTab === 'santri' ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left text-xs min-w-[850px]">
               <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
                 <tr>
                   <th className="p-3 w-10 text-center">No</th>
@@ -335,8 +335,8 @@ export const RekapBulananView: React.FC<RekapBulananViewProps> = ({
             </table>
           </div>
         ) : activeTab === 'ustadz' ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left text-xs min-w-[750px]">
               <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
                 <tr>
                   <th className="p-3 w-10 text-center">No</th>

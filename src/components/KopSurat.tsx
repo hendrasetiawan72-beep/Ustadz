@@ -16,55 +16,67 @@ export const KopSurat: React.FC<KopSuratProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false);
 
+  const hasContactInfo = Boolean(
+    settings.address || settings.phone || settings.email || settings.website
+  );
+
   return (
     <div className={`w-full bg-white text-slate-900 pb-2 ${className}`}>
-      <div className="flex items-center gap-5 border-b-2 border-slate-800 pb-3">
-        {/* Logo Resmi */}
+      {/* Kop Header: Logo di Kiri & Teks di Tengah */}
+      <div className="flex items-center gap-3 sm:gap-6 pb-3">
+        {/* Logo Resmi Lembaga */}
         <div className="shrink-0 flex items-center justify-center">
           {!imageError && settings.logoUrl ? (
             <img
               src={settings.logoUrl}
               alt="Logo Resmi Ponpes Baitul Arqom SMK Muhiba"
               referrerPolicy="no-referrer"
-              className="h-20 w-20 object-contain"
+              className="h-18 w-18 sm:h-22 sm:w-22 object-contain"
               onError={() => setImageError(true)}
             />
           ) : (
-            <div className="h-20 w-20 rounded-xl bg-emerald-700 text-white flex flex-col items-center justify-center font-bold text-xs p-1 text-center shadow-inner">
-              <span>MUHIBA</span>
-              <span className="text-[9px] font-normal opacity-90">BAITUL ARQOM</span>
+            <div className="h-18 w-18 sm:h-22 sm:w-22 rounded-xl bg-emerald-800 text-white flex flex-col items-center justify-center font-bold text-xs p-1 text-center shadow-inner">
+              <span className="font-extrabold text-[13px] leading-tight">MUHIBA</span>
+              <span className="text-[9px] font-semibold tracking-wider opacity-90">BAITUL ARQOM</span>
             </div>
           )}
         </div>
 
-        {/* Identitas Lembaga */}
-        <div className="flex-1 text-center pr-4">
-          <h1 className="text-xl font-extrabold tracking-wider text-slate-900 uppercase">
-            {settings.institutionName}
+        {/* Identitas Resmi Lembaga */}
+        <div className="flex-1 text-center min-w-0 pr-1 sm:pr-4">
+          <h1 className="text-base sm:text-xl font-black tracking-wide text-slate-950 uppercase leading-snug break-words">
+            PONPES BAITUL ARQOM SMK MUHIBA
           </h1>
-          <p className="text-xs font-semibold text-slate-700 mt-0.5">
-            {settings.subTitle}
-          </p>
-          <p className="text-[11px] text-slate-600 mt-1">
-            {settings.address} &middot; Telp/WA: {settings.phone}
-          </p>
-          <p className="text-[10px] text-slate-500">
-            Email: {settings.email} &middot; Web: {settings.website}
-          </p>
+          <h2 className="text-sm sm:text-base font-extrabold text-slate-800 uppercase tracking-wider mt-0.5 break-words">
+            SMK MUHAMMADIYAH BAWANG
+          </h2>
+
+          {hasContactInfo && (
+            <div className="text-[11px] text-slate-600 mt-1 space-y-0.5 leading-tight break-words">
+              {settings.address && <p>{settings.address}</p>}
+              <p>
+                {settings.phone && <span>Telp/WA: {settings.phone}</span>}
+                {settings.phone && settings.email && <span> &middot; </span>}
+                {settings.email && <span>Email: {settings.email}</span>}
+                {settings.website && <span> &middot; Web: {settings.website}</span>}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Garis Ganda Standar Surat Resmi */}
-      <div className="border-b border-slate-800 pt-[2px] mb-4"></div>
+      {/* Garis Ganda Standar Surat Resmi (Tebal di atas, tipis di bawah) */}
+      <div className="border-b-[3px] border-slate-900 w-full"></div>
+      <div className="border-b border-slate-900 w-full pt-[2px] mb-4"></div>
 
       {/* Judul Laporan & Periode jika diberikan */}
       {reportTitle && (
-        <div className="text-center my-3">
-          <h2 className="text-base font-bold uppercase tracking-wide text-slate-900">
+        <div className="text-center my-3 px-2">
+          <h3 className="text-sm sm:text-base font-extrabold uppercase tracking-wide text-slate-900 break-words">
             {reportTitle}
-          </h2>
+          </h3>
           {reportPeriod && (
-            <p className="text-xs font-medium text-slate-600 mt-0.5">
+            <p className="text-xs font-semibold text-slate-600 mt-0.5">
               Periode: {reportPeriod}
             </p>
           )}

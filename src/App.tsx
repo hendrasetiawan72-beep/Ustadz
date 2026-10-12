@@ -156,23 +156,25 @@ export default function App() {
         currentUser={currentUser}
         onLogout={handleLogout}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        isSidebarOpen={sidebarOpen}
         settings={settings}
         isSupabaseLive={isSupabaseLive}
       />
 
       {/* Main Layout Area */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Navigation Sidebar */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* Navigation Sidebar (Bilah Samping bisa disembunyikan) */}
         <Sidebar
           currentTab={currentTab}
           onSelectTab={setCurrentTab}
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
+          onToggleCollapse={() => setSidebarOpen(false)}
         />
 
         {/* Viewport Content Canvas */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50">
-          <div className="max-w-7xl mx-auto pb-12">
+        <main className="flex-1 overflow-y-auto p-3 sm:p-6 md:p-8 bg-slate-50 min-w-0 transition-all duration-300">
+          <div className="max-w-7xl mx-auto pb-12 min-w-0">
             {isLoading ? (
               <div className="flex items-center justify-center min-h-[400px]">
                 <div className="text-center">

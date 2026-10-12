@@ -207,8 +207,8 @@ export const DataSantriView: React.FC<DataSantriViewProps> = ({
           <span className="text-slate-400">Diperbarui real-time</span>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left text-xs min-w-[760px]">
             <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
               <tr>
                 <th className="py-3 px-4 font-semibold w-12 text-center">No</th>
