@@ -61,7 +61,6 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
     (s) => s.sessionType === 'morning' && s.activityDate === selectedDate
   );
 
-  // Sync state when date or existing session changes
   useEffect(() => {
     if (existingSession) {
       setSelectedUstadzId(existingSession.ustadzId);
@@ -81,7 +80,6 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
       });
       setAttendanceMap(newMap);
     } else {
-      // Default new state
       setTopic(settings.morningSessionDefaultTitle);
       setIncidentNotes('');
       const defaultMap: Record<string, { status: AttendanceStatus; notes: string }> = {};
@@ -135,7 +133,6 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
       let sessionId = existingSession?.id;
 
       if (!sessionId) {
-        // Create session
         const newSession = await addActivitySession({
           sessionType: 'morning',
           activityName: settings.morningSessionDefaultTitle,
@@ -152,7 +149,6 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
         sessionId = newSession.id;
       }
 
-      // Save student attendance batch
       const batchPayload = activeSantri.map((s) => ({
         santriId: s.id,
         attendanceStatus: attendanceMap[s.id]?.status || 'hadir',
@@ -180,7 +176,7 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
       Kelas: s.className,
       Asrama: s.dormitory,
       Tanggal: selectedDate,
-      Sesi: 'Pagi (Subuh - 06:00 WIB)',
+      Sesi: 'Pagi (Subuh - 06.00 WIB)',
       Status: (attendanceMap[s.id]?.status || 'hadir').toUpperCase(),
       Keterangan: attendanceMap[s.id]?.notes || '-',
     }));
@@ -195,76 +191,81 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Top Header Card */}
+      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <Sun className="w-5 h-5 text-orange-500" />
-            Absensi Kegiatan Pagi (Subuh — 06.00 WIB)
+          <div className="flex items-center gap-2 mb-1">
+            <span className="neo-badge px-3 py-0.5 text-[10px] font-black bg-[#FEF08A] text-amber-950 uppercase tracking-wider inline-flex items-center gap-1">
+              <Sun className="w-3.5 h-3.5 text-amber-700" />
+              Sesi Subuh &ndash; 06.00 WIB
+            </span>
+          </div>
+          <h2 className="font-display text-xl sm:text-2xl font-black text-slate-950 tracking-tight">
+            Absensi Kegiatan Pagi Santri
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Pencatatan kehadiran sholat Subuh berjamaah, kuliah Subuh, dan muhadatsah bahasa
+          <p className="text-xs text-slate-600 mt-0.5 font-medium">
+            Sholat Subuh Berjamaah &amp; Pembinaan Santri &middot; Ponpes Baitul Arqom
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           <button
             onClick={() => onOpenReportModal('absensi_pagi')}
-            className="px-3 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-1.5 transition-colors"
+            className="neo-btn px-3.5 py-2 text-xs font-bold text-slate-900 bg-white hover:bg-slate-50 rounded-xl flex items-center gap-1.5"
           >
-            <Printer className="w-3.5 h-3.5 text-slate-500" />
+            <Printer className="w-3.5 h-3.5 text-slate-700" />
             <span>Cetak PDF</span>
           </button>
 
           <button
             onClick={handleExportExcel}
-            className="px-3 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl flex items-center gap-1.5 transition-colors"
+            className="neo-btn px-3.5 py-2 text-xs font-bold text-emerald-950 bg-[#DCFCE7] hover:bg-[#BBF7D0] rounded-xl flex items-center gap-1.5"
           >
-            <FileSpreadsheet className="w-3.5 h-3.5" />
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-800" />
             <span>Ekspor Excel</span>
           </button>
 
           <button
             onClick={handleSaveAttendance}
             disabled={isSaving}
-            className="px-4 py-2 text-xs font-bold text-white bg-orange-500 hover:bg-orange-600 disabled:opacity-50 rounded-xl shadow-xs flex items-center gap-1.5 transition-colors"
+            className="neo-btn px-4 py-2 text-xs font-black text-amber-950 bg-[#FDE047] hover:bg-[#FACC15] disabled:opacity-50 rounded-xl flex items-center gap-1.5 cursor-pointer"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 text-amber-900" />
             <span>{isSaving ? 'Menyimpan...' : 'Simpan Absensi'}</span>
           </button>
         </div>
       </div>
 
       {savedSuccessMsg && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 text-emerald-800 text-xs font-semibold">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+        <div className="p-3.5 bg-[#DCFCE7] border-2 border-slate-900 rounded-xl flex items-center gap-2 text-emerald-950 text-xs font-bold shadow-[2px_2px_0px_#1e293b]">
+          <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
           <span>Berhasil menyimpan absensi santri kegiatan pagi ke database!</span>
         </div>
       )}
 
-      {/* Control Session Bar (Date, Duty Ustadz, Topic) */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs space-y-4 text-xs">
+      {/* Control Session Bar */}
+      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-5 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">
+            <label className="block font-bold text-slate-800 mb-1.5 uppercase text-[10px] tracking-wider">
               Tanggal Kegiatan
             </label>
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full border border-slate-300 rounded-xl px-3 py-2 font-mono bg-white text-slate-800"
+              className="w-full border-2 border-slate-900 rounded-xl px-3 py-2 font-mono bg-white text-slate-900 font-bold shadow-[1.5px_1.5px_0px_rgba(30,41,59,0.1)] focus:shadow-[2px_2px_0px_#1e293b] outline-none"
             />
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">
+            <label className="block font-bold text-slate-800 mb-1.5 uppercase text-[10px] tracking-wider">
               Ustadz / Ustadzah Piket Bertugas
             </label>
             <select
               value={selectedUstadzId}
               onChange={(e) => setSelectedUstadzId(e.target.value)}
-              className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-800 font-medium"
+              className="w-full border-2 border-slate-900 rounded-xl px-3 py-2 bg-white text-slate-900 font-bold shadow-[1.5px_1.5px_0px_rgba(30,41,59,0.1)] focus:shadow-[2px_2px_0px_#1e293b] outline-none"
             >
               {ustadzList.map((u) => (
                 <option key={u.id} value={u.id}>
@@ -277,84 +278,84 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
           <div className="flex items-end">
             <button
               onClick={handleMarkAllHadir}
-              className="w-full py-2 bg-orange-50 hover:bg-orange-100 text-orange-950 border border-orange-200 font-bold rounded-xl flex items-center justify-center gap-2 transition-colors"
+              className="neo-btn w-full py-2 bg-[#FEF3C7] hover:bg-[#FDE68A] text-amber-950 font-black rounded-xl flex items-center justify-center gap-2 cursor-pointer"
             >
-              <CheckCheck className="w-4 h-4 text-orange-600" />
+              <CheckCheck className="w-4 h-4 text-amber-800" />
               <span>Tandai Semua Santri Hadir</span>
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t-2 border-slate-900/10">
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">
-              Materi Kuliah Subuh / Muhadatsah
+            <label className="block font-bold text-slate-800 mb-1 uppercase text-[10px] tracking-wider">
+              Topik Pembinaan / Kuliah Subuh
             </label>
             <input
               type="text"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              placeholder="Contoh: Kajian Hadits Arbain Nawawi & Mufrodat Yaumiyyah"
-              className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-800"
+              placeholder="Contoh: Pembinaan Akhlaq & Muhadatsah Pagi"
+              className="w-full border-2 border-slate-900 rounded-xl px-3 py-2 bg-white text-slate-900 font-medium shadow-[1.5px_1.5px_0px_rgba(30,41,59,0.1)] focus:shadow-[2px_2px_0px_#1e293b] outline-none"
             />
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">
-              Catatan Kedisiplinan Bangun Subuh
+            <label className="block font-bold text-slate-800 mb-1 uppercase text-[10px] tracking-wider">
+              Catatan Piket Pagi
             </label>
             <input
               type="text"
               value={incidentNotes}
               onChange={(e) => setIncidentNotes(e.target.value)}
-              placeholder="Contoh: Seluruh santri bangun tepat waktu sebelum iqomah"
-              className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-800"
+              placeholder="Contoh: Kegiatan berjalan lancar, cuaca cerah"
+              className="w-full border-2 border-slate-900 rounded-xl px-3 py-2 bg-white text-slate-900 font-medium shadow-[1.5px_1.5px_0px_rgba(30,41,59,0.1)] focus:shadow-[2px_2px_0px_#1e293b] outline-none"
             />
           </div>
         </div>
       </div>
 
-      {/* Counter Strip */}
+      {/* Counter Strip: Soft Pastel Neobrutalist Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-emerald-50 border border-emerald-200/70 rounded-2xl p-3 text-center">
-          <span className="text-[11px] font-bold text-emerald-800 uppercase block">Hadir</span>
-          <span className="text-2xl font-extrabold text-emerald-700 font-mono tabular-nums">{hadirCount}</span>
+        <div className="bg-[#DCFCE7] border-2 border-slate-900 rounded-2xl p-3 text-center shadow-[2.5px_2.5px_0px_#1e293b]">
+          <span className="text-[10px] font-black text-emerald-950 uppercase tracking-wider block">Hadir</span>
+          <span className="font-display text-2xl font-black text-emerald-950 font-mono tabular-nums">{hadirCount}</span>
         </div>
-        <div className="bg-blue-50 border border-blue-200/70 rounded-2xl p-3 text-center">
-          <span className="text-[11px] font-bold text-blue-800 uppercase block">Izin</span>
-          <span className="text-2xl font-extrabold text-blue-700 font-mono tabular-nums">{izinCount}</span>
+        <div className="bg-[#E0F2FE] border-2 border-slate-900 rounded-2xl p-3 text-center shadow-[2.5px_2.5px_0px_#1e293b]">
+          <span className="text-[10px] font-black text-sky-950 uppercase tracking-wider block">Izin</span>
+          <span className="font-display text-2xl font-black text-sky-950 font-mono tabular-nums">{izinCount}</span>
         </div>
-        <div className="bg-amber-50 border border-amber-200/70 rounded-2xl p-3 text-center">
-          <span className="text-[11px] font-bold text-amber-800 uppercase block">Sakit</span>
-          <span className="text-2xl font-extrabold text-amber-700 font-mono tabular-nums">{sakitCount}</span>
+        <div className="bg-[#FEF9C3] border-2 border-slate-900 rounded-2xl p-3 text-center shadow-[2.5px_2.5px_0px_#1e293b]">
+          <span className="text-[10px] font-black text-amber-950 uppercase tracking-wider block">Sakit</span>
+          <span className="font-display text-2xl font-black text-amber-950 font-mono tabular-nums">{sakitCount}</span>
         </div>
-        <div className="bg-rose-50 border border-rose-200/70 rounded-2xl p-3 text-center">
-          <span className="text-[11px] font-bold text-rose-800 uppercase block">Alpa</span>
-          <span className="text-2xl font-extrabold text-rose-700 font-mono tabular-nums">{alpaCount}</span>
+        <div className="bg-[#FFE4E6] border-2 border-slate-900 rounded-2xl p-3 text-center shadow-[2.5px_2.5px_0px_#1e293b]">
+          <span className="text-[10px] font-black text-rose-950 uppercase tracking-wider block">Alpa</span>
+          <span className="font-display text-2xl font-black text-rose-950 font-mono tabular-nums">{alpaCount}</span>
         </div>
       </div>
 
       {/* Santri Attendance List */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
-        {/* Search */}
-        <div className="p-3.5 border-b border-slate-100 flex items-center justify-between gap-3 text-xs">
+      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl shadow-[4px_4px_0px_#1e293b] overflow-hidden">
+        {/* Search header */}
+        <div className="p-3.5 border-b-2 border-slate-900/10 flex items-center justify-between gap-3 text-xs bg-[#FAF7F2]">
           <div className="relative flex-1 max-w-sm">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari santri..."
-              className="w-full pl-9 pr-3 py-1.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white"
+              placeholder="Cari nama santri, NIS, kelas..."
+              className="w-full pl-9 pr-3 py-1.5 border-2 border-slate-900 rounded-xl bg-white text-slate-900 font-medium text-xs shadow-[1.5px_1.5px_0px_rgba(30,41,59,0.1)] outline-none"
             />
           </div>
-          <span className="text-slate-400 font-mono">
+          <span className="text-slate-600 font-bold font-mono text-xs">
             {filteredSantri.length} Santri
           </span>
         </div>
 
         {/* Rows */}
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y-2 divide-slate-900/10">
           {filteredSantri.map((s, idx) => {
             const currentStatus = attendanceMap[s.id]?.status || 'hadir';
             const currentNotes = attendanceMap[s.id]?.notes || '';
@@ -362,21 +363,21 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
             return (
               <div
                 key={s.id}
-                className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/70 transition-colors"
+                className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#FAF7F2] transition-colors"
               >
                 <div className="flex items-center gap-3 min-w-0 flex-1 sm:flex-initial sm:min-w-[220px]">
-                  <span className="w-6 text-center text-slate-400 font-mono text-xs shrink-0">{idx + 1}</span>
+                  <span className="w-6 text-center text-slate-400 font-mono text-xs shrink-0 font-bold">{idx + 1}</span>
                   <div className="min-w-0">
-                    <h4 className="font-bold text-slate-900 text-xs md:text-sm truncate" title={s.fullName}>
+                    <h4 className="font-display font-black text-slate-950 text-xs md:text-sm truncate" title={s.fullName}>
                       {s.fullName}
                     </h4>
-                    <p className="text-[11px] text-slate-500 font-mono truncate">
+                    <p className="text-[11px] text-slate-600 font-mono font-medium truncate">
                       {s.studentNumber} &middot; {s.className} &middot; {s.dormitory}
                     </p>
                   </div>
                 </div>
 
-                {/* 4 Simple Status Buttons */}
+                {/* 4 Neobrutalist Rounded Status Buttons */}
                 <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                   {(['hadir', 'izin', 'sakit', 'alpa'] as AttendanceStatus[]).map((st) => {
                     const isSelected = currentStatus === st;
@@ -384,16 +385,16 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
                       <button
                         key={st}
                         onClick={() => handleSetStatus(s.id, st)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase transition-all ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
                           isSelected
                             ? st === 'hadir'
-                              ? 'bg-emerald-600 text-white shadow-xs'
+                              ? 'bg-[#BBF7D0] text-emerald-950 border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b]'
                               : st === 'izin'
-                              ? 'bg-blue-600 text-white shadow-xs'
+                              ? 'bg-[#BAE6FD] text-sky-950 border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b]'
                               : st === 'sakit'
-                              ? 'bg-amber-600 text-white shadow-xs'
-                              : 'bg-rose-600 text-white shadow-xs'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                              ? 'bg-[#FEF08A] text-amber-950 border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b]'
+                              : 'bg-[#FECDD3] text-rose-950 border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b]'
+                            : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-300'
                         }`}
                       >
                         {st === 'hadir'
@@ -415,7 +416,7 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
                     value={currentNotes}
                     onChange={(e) => handleSetNotes(s.id, e.target.value)}
                     placeholder="Catatan..."
-                    className="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white"
+                    className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-xl bg-white text-slate-800 focus:border-slate-900 outline-none"
                   />
                 </div>
               </div>

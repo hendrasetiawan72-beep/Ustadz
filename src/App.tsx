@@ -54,7 +54,12 @@ export default function App() {
   });
 
   const [currentTab, setCurrentTab] = useState<NavigationTab>('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 1024;
+    }
+    return true;
+  });
 
   // Core Data State
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
@@ -150,7 +155,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-emerald-100 selection:text-emerald-900">
+    <div className="min-h-screen bg-[#FAF7F2] flex flex-col selection:bg-amber-200 selection:text-amber-950">
       {/* Header Bar */}
       <Header
         currentUser={currentUser}
@@ -173,7 +178,7 @@ export default function App() {
         />
 
         {/* Viewport Content Canvas */}
-        <main className="flex-1 overflow-y-auto p-3 sm:p-6 md:p-8 bg-slate-50 min-w-0 transition-all duration-300">
+        <main className="flex-1 overflow-y-auto p-3 sm:p-6 md:p-8 bg-[#FAF7F2] min-w-0 transition-all duration-300">
           <div className="max-w-7xl mx-auto pb-12 min-w-0">
             {isLoading ? (
               <div className="flex items-center justify-center min-h-[400px]">

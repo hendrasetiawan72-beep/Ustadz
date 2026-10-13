@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   Clock,
   ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -110,82 +111,90 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const terlambatTotal = attendances.filter((a) => a.attendanceStatus === 'terlambat').length;
 
   const pieData = [
-    { name: 'Hadir', value: hadirTotal || 1, color: '#10b981' },
-    { name: 'Izin', value: izinTotal, color: '#3b82f6' },
-    { name: 'Sakit', value: sakitTotal, color: '#f59e0b' },
-    { name: 'Alpa', value: alpaTotal, color: '#ef4444' },
-    { name: 'Terlambat', value: terlambatTotal, color: '#8b5cf6' },
+    { name: 'Hadir', value: hadirTotal || 1, color: '#34d399' },
+    { name: 'Izin', value: izinTotal, color: '#60a5fa' },
+    { name: 'Sakit', value: sakitTotal, color: '#fbbf24' },
+    { name: 'Alpa', value: alpaTotal, color: '#f87171' },
+    { name: 'Terlambat', value: terlambatTotal, color: '#c084fc' },
   ].filter((item) => item.value > 0);
 
   return (
     <div className="space-y-6">
-      {/* Top Banner & Quick Actions */}
-      <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border border-emerald-100 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 text-emerald-800 text-xs font-bold tracking-wide uppercase mb-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-            Operasional Pesantren Aktif
+      {/* Top Banner & Quick Actions: Postmodern Neobrutalist Rounded Canvas */}
+      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-[2rem] p-6 sm:p-8 shadow-[5px_5px_0px_#1e293b] flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative overflow-hidden">
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="neo-badge px-3 py-0.5 text-[10px] font-black bg-[#DCFCE7] text-emerald-950 uppercase tracking-wider inline-flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block animate-pulse"></span>
+              Operasional Harian Aktif
+            </span>
+            <span className="text-xs font-bold text-slate-500">
+              SMK Muhammadiyah Bawang
+            </span>
           </div>
-          <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
-            Assalamu’alaikum Warahmatullah, Selamat Bertugas
+          <h2 className="font-display text-xl sm:text-2xl md:text-3xl font-black text-slate-950 tracking-tight">
+            Assalamu’alaikum, Selamat Bertugas!
           </h2>
-          <p className="text-xs md:text-sm text-slate-600 mt-1 max-w-2xl">
-            Sistem absensi piket terpadu Ponpes Baitul Arqom SMK Muhiba. Pantau kehadiran santri sholat berjamaah Subuh, kajian Maghrib-Isya, dan kepatuhan piket harian.
+          <p className="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-2xl leading-relaxed">
+            Sistem absensi piket terpadu Ponpes Baitul Arqom. Pantau kehadiran santri sholat berjamaah Subuh, kajian kitab Maghrib-Isya, dan keteraturan piket ustadz/ustadzah.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+        {/* Quick Neobrutalist Action Buttons */}
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0 relative z-10">
           <button
             onClick={() => onNavigate('kegiatan_malam')}
-            className="px-4 py-2.5 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-xl shadow-sm flex items-center gap-2 transition-all hover:translate-y-[-1px]"
+            className="neo-btn px-4 py-2.5 text-xs font-black text-purple-950 bg-[#EDE9FE] hover:bg-[#DDD6FE] rounded-xl flex items-center gap-2"
           >
-            <Moon className="w-4 h-4" />
+            <Moon className="w-4 h-4 text-purple-700" />
             <span>Absen Malam</span>
           </button>
           <button
             onClick={() => onNavigate('kegiatan_pagi')}
-            className="px-4 py-2.5 text-xs font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-xl shadow-sm flex items-center gap-2 transition-all hover:translate-y-[-1px]"
+            className="neo-btn px-4 py-2.5 text-xs font-black text-amber-950 bg-[#FEF08A] hover:bg-[#FDE047] rounded-xl flex items-center gap-2"
           >
-            <Sun className="w-4 h-4" />
+            <Sun className="w-4 h-4 text-amber-700" />
             <span>Absen Pagi</span>
           </button>
           <button
             onClick={() => onNavigate('jadwal_piket')}
-            className="px-4 py-2.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2 transition-colors"
+            className="neo-btn px-4 py-2.5 text-xs font-bold text-slate-900 bg-[#E0F2FE] hover:bg-[#BAE6FD] rounded-xl flex items-center gap-2"
           >
-            <CalendarCheck className="w-4 h-4 text-blue-600" />
+            <CalendarCheck className="w-4 h-4 text-sky-700" />
             <span>Jadwal Piket</span>
           </button>
           <button
             onClick={() => onNavigate('cetak_ekspor')}
-            className="px-4 py-2.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2 transition-colors"
+            className="neo-btn px-4 py-2.5 text-xs font-bold text-slate-900 bg-[#DCFCE7] hover:bg-[#BBF7D0] rounded-xl flex items-center gap-2"
           >
-            <FileText className="w-4 h-4 text-emerald-600" />
-            <span>Cetak PDF</span>
+            <FileText className="w-4 h-4 text-emerald-800" />
+            <span>Cetak Dokumen</span>
           </button>
         </div>
       </div>
 
-      {/* Primary KPI Grid (Pastel Cards) */}
+      {/* Primary KPI Grid: Colorful Soft Pastel Rounded Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Ustadz Piket Hari Ini */}
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+        {/* Card 1: Ustadz Piket Hari Ini (Pastel Mint) */}
+        <div className="bg-[#F0FDF4] border-2 border-slate-900 rounded-2xl p-5 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Ustadz/ah Piket Hari Ini</span>
-            <div className="p-2 bg-emerald-100/70 text-emerald-700 rounded-xl">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-950">
+              Piket Hari Ini
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-white border border-slate-900 flex items-center justify-center text-emerald-800 shadow-[1px_1px_0px_#1e293b]">
               <CalendarCheck className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <p className="text-base font-bold text-slate-900 truncate">
+            <p className="font-display text-base font-black text-slate-950 truncate">
               {todaySchedule ? todaySchedule.ustadzName : 'Belum Ditentukan'}
             </p>
             <div className="mt-1 flex items-center gap-1.5 text-xs">
               <span
-                className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                className={`neo-badge px-2.5 py-0.5 text-[10px] font-black ${
                   todaySchedule?.status === 'sudah_bertugas'
-                    ? 'bg-emerald-100 text-emerald-800'
-                    : 'bg-amber-100 text-amber-800'
+                    ? 'bg-[#BBF7D0] text-emerald-950'
+                    : 'bg-[#FEF08A] text-amber-950'
                 }`}
               >
                 {todaySchedule?.status === 'sudah_bertugas' ? 'Sudah Bertugas' : 'Terjadwal Hari Ini'}
@@ -194,64 +203,70 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
 
-        {/* Card 2: Total Santri Aktif */}
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+        {/* Card 2: Total Santri Aktif (Pastel Sky) */}
+        <div className="bg-[#F0F9FF] border-2 border-slate-900 rounded-2xl p-5 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Santri Terdaftar</span>
-            <div className="p-2 bg-teal-100/70 text-teal-700 rounded-xl">
+            <span className="text-xs font-bold uppercase tracking-wider text-sky-950">
+              Santri Terdaftar
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-white border border-slate-900 flex items-center justify-center text-sky-800 shadow-[1px_1px_0px_#1e293b]">
               <Users className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-extrabold text-slate-900 font-mono tabular-nums">
+              <span className="font-display text-3xl font-black text-slate-950 font-mono tabular-nums">
                 {activeSantriCount}
               </span>
-              <span className="text-xs text-slate-500">Santri Aktif</span>
+              <span className="text-xs font-bold text-slate-600">Santri Aktif</span>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-600 mt-1 font-medium">
               {santriAttendedCount} diabsen &middot; {santriPendingCount} belum
             </p>
           </div>
         </div>
 
-        {/* Card 3: Kegiatan Subuh & Pagi */}
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+        {/* Card 3: Kegiatan Subuh & Pagi (Pastel Butter/Apricot) */}
+        <div className="bg-[#FEFCE8] border-2 border-slate-900 rounded-2xl p-5 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Kegiatan Subuh Hari Ini</span>
-            <div className="p-2 bg-orange-100/70 text-orange-700 rounded-xl">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-950">
+              Subuh & Pagi
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-white border border-slate-900 flex items-center justify-center text-amber-800 shadow-[1px_1px_0px_#1e293b]">
               <Sun className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span className="text-sm font-bold text-slate-800">
+              <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+              <span className="font-display text-sm font-black text-slate-900">
                 {morningSessionToday ? 'Terlaksana' : 'Belum Dicatat'}
               </span>
             </div>
-            <p className="text-xs text-slate-500 mt-1 truncate">
+            <p className="text-xs text-slate-600 mt-1 truncate font-medium">
               {morningSessionToday ? morningSessionToday.topic || 'Sholat Subuh & Kuliah' : 'Pukul 04:30 - 06:00 WIB'}
             </p>
           </div>
         </div>
 
-        {/* Card 4: Kegiatan Maghrib - Isya */}
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+        {/* Card 4: Kegiatan Malam (Pastel Lavender) */}
+        <div className="bg-[#FAF5FF] border-2 border-slate-900 rounded-2xl p-5 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Kegiatan Malam</span>
-            <div className="p-2 bg-purple-100/70 text-purple-700 rounded-xl">
+            <span className="text-xs font-bold uppercase tracking-wider text-purple-950">
+              Maghrib & Isya
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-white border border-slate-900 flex items-center justify-center text-purple-800 shadow-[1px_1px_0px_#1e293b]">
               <Moon className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-bold text-slate-800">
+              <Clock className="w-4 h-4 text-purple-700" />
+              <span className="font-display text-sm font-black text-slate-900">
                 {nightSessionToday ? 'Tercatat' : 'Jadwal 17:45 WIB'}
               </span>
             </div>
-            <p className="text-xs text-slate-500 mt-1 truncate">
+            <p className="text-xs text-slate-600 mt-1 truncate font-medium">
               {nightSessionToday ? nightSessionToday.topic : 'Kajian Kitab Kuning & Tadarrus'}
             </p>
           </div>
@@ -261,22 +276,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Middle Section: Chart & Today's Duty Status */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left 2 Cols: Attendance Bar Chart */}
-        <div className="lg:col-span-2 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs">
+        <div className="lg:col-span-2 bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b]">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-bold text-slate-900 text-sm md:text-base flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-emerald-600" />
+              <h3 className="font-display font-black text-slate-950 text-sm md:text-base flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-emerald-700" />
                 Tren Kehadiran Santri (7 Hari Terakhir)
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-600 font-medium">
                 Data real-time kehadiran sholat berjamaah & kajian pesantren
               </p>
             </div>
             <button
               onClick={() => onNavigate('rekap_bulanan')}
-              className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
+              className="neo-btn px-3 py-1 bg-white text-xs font-bold text-slate-900 rounded-lg flex items-center gap-1 cursor-pointer"
             >
-              <span>Lihat Detail</span>
+              <span>Detail</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -284,46 +299,48 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartDays}>
-                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#334155', fontWeight: 600 }} />
+                <YAxis tick={{ fontSize: 11, fill: '#334155' }} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#ffffff',
+                    backgroundColor: '#FFFDF9',
                     borderRadius: '12px',
-                    border: '1px solid #e2e8f0',
+                    border: '2px solid #1E293B',
+                    boxShadow: '3px 3px 0px #1E293B',
                     fontSize: '12px',
+                    fontWeight: 600,
                   }}
                 />
-                <Bar dataKey="Hadir" fill="#10b981" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="IzinSakit" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Alpa" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Hadir" fill="#34d399" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="IzinSakit" fill="#60a5fa" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="Alpa" fill="#f87171" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          <div className="flex items-center justify-center gap-6 mt-3 text-xs text-slate-600 border-t border-slate-100 pt-3">
+          <div className="flex items-center justify-center gap-6 mt-3 text-xs text-slate-800 font-bold border-t-2 border-slate-900/10 pt-3">
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+              <span className="w-3 h-3 rounded-full bg-[#34d399] border border-slate-900 inline-block"></span>
               <span>Hadir</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
+              <span className="w-3 h-3 rounded-full bg-[#60a5fa] border border-slate-900 inline-block"></span>
               <span>Izin / Sakit</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+              <span className="w-3 h-3 rounded-full bg-[#f87171] border border-slate-900 inline-block"></span>
               <span>Alpa</span>
             </div>
           </div>
         </div>
 
         {/* Right 1 Col: Status Santri Pie & Quick Verification */}
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
+        <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] flex flex-col justify-between">
           <div>
-            <h3 className="font-bold text-slate-900 text-sm md:text-base">
+            <h3 className="font-display font-black text-slate-950 text-sm md:text-base">
               Distribusi Status Absensi
             </h3>
-            <p className="text-xs text-slate-500 mb-4">
+            <p className="text-xs text-slate-600 mb-4 font-medium">
               Komposisi kehadiran santri bulan ini
             </p>
 
@@ -340,50 +357,59 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     dataKey="value"
                   >
                     {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell key={`cell-${index}`} fill={entry.color} stroke="#1E293B" strokeWidth={1.5} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#FFFDF9',
+                      borderRadius: '10px',
+                      border: '2px solid #1E293B',
+                      boxShadow: '2px 2px 0px #1E293B',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
 
-            <div className="space-y-1.5 mt-2 text-xs">
-              <div className="flex items-center justify-between text-slate-700">
+            <div className="space-y-1.5 mt-2 text-xs font-semibold">
+              <div className="flex items-center justify-between text-slate-800">
                 <span className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#34d399] border border-slate-900"></span>
                   Hadir
                 </span>
-                <span className="font-mono font-bold">{hadirTotal} Santri</span>
+                <span className="font-mono font-black">{hadirTotal} Santri</span>
               </div>
-              <div className="flex items-center justify-between text-slate-700">
+              <div className="flex items-center justify-between text-slate-800">
                 <span className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#60a5fa] border border-slate-900"></span>
                   Izin
                 </span>
-                <span className="font-mono font-bold">{izinTotal}</span>
+                <span className="font-mono font-black">{izinTotal}</span>
               </div>
-              <div className="flex items-center justify-between text-slate-700">
+              <div className="flex items-center justify-between text-slate-800">
                 <span className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#fbbf24] border border-slate-900"></span>
                   Sakit
                 </span>
-                <span className="font-mono font-bold">{sakitTotal}</span>
+                <span className="font-mono font-black">{sakitTotal}</span>
               </div>
-              <div className="flex items-center justify-between text-slate-700">
+              <div className="flex items-center justify-between text-slate-800">
                 <span className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#f87171] border border-slate-900"></span>
                   Alpa
                 </span>
-                <span className="font-mono font-bold text-red-600">{alpaTotal}</span>
+                <span className="font-mono font-black text-rose-700">{alpaTotal}</span>
               </div>
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-100 mt-4">
+          <div className="pt-4 border-t-2 border-slate-900/10 mt-4">
             <button
               onClick={() => onNavigate('kegiatan_malam')}
-              className="w-full py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl transition-colors text-center"
+              className="neo-btn w-full py-2 bg-[#DCFCE7] hover:bg-[#BBF7D0] text-emerald-950 font-black text-xs rounded-xl transition-all text-center cursor-pointer"
             >
               Isi Absensi Kegiatan Malam
             </button>
@@ -394,54 +420,54 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Bottom Section: Jadwal Pekan Ini & Riwayat Terakhir */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Jadwal Ustadz Pekan Ini */}
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs">
+        <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b]">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-bold text-slate-900 text-sm">
+              <h3 className="font-display font-black text-slate-950 text-sm md:text-base">
                 Jadwal Piket Ustadz Pekan Ini
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-600 font-medium">
                 Aturan baku: 1 Ustadz bertugas 1 kali per minggu
               </p>
             </div>
             <button
               onClick={() => onNavigate('jadwal_piket')}
-              className="text-xs font-semibold text-blue-700 hover:text-blue-800"
+              className="neo-btn px-2.5 py-1 bg-white text-xs font-bold text-slate-900 rounded-lg cursor-pointer"
             >
               Kelola Jadwal
             </button>
           </div>
 
-          <div className="divide-y divide-slate-100 text-xs">
+          <div className="divide-y-2 divide-slate-900/10 text-xs">
             {schedules.slice(0, 5).map((sch) => {
               const isToday = sch.scheduleDate === todayStr;
               return (
                 <div key={sch.id} className="py-2.5 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`w-9 h-9 rounded-xl flex flex-col items-center justify-center font-bold text-[11px] ${
+                      className={`w-9 h-9 rounded-xl border border-slate-900 flex flex-col items-center justify-center font-black text-[11px] shadow-[1.5px_1.5px_0px_#1e293b] ${
                         isToday
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-slate-100 text-slate-700'
+                          ? 'bg-[#BBF7D0] text-emerald-950'
+                          : 'bg-[#F1F5F9] text-slate-800'
                       }`}
                     >
                       <span>{sch.dayName.slice(0, 3)}</span>
                     </div>
                     <div>
-                      <p className="font-semibold text-slate-800">{sch.ustadzName}</p>
-                      <p className="text-slate-500 text-[11px]">
+                      <p className="font-bold text-slate-900">{sch.ustadzName}</p>
+                      <p className="text-slate-500 text-[11px] font-medium">
                         {sch.scheduleDate} {sch.notes ? `&middot; ${sch.notes}` : ''}
                       </p>
                     </div>
                   </div>
 
                   <span
-                    className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                    className={`neo-badge px-2.5 py-0.5 text-[10px] font-black ${
                       sch.status === 'sudah_bertugas'
-                        ? 'bg-emerald-100 text-emerald-800'
+                        ? 'bg-[#DCFCE7] text-emerald-950'
                         : sch.status === 'terjadwal'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-slate-100 text-slate-600'
+                        ? 'bg-[#E0F2FE] text-sky-950'
+                        : 'bg-slate-100 text-slate-700'
                     }`}
                   >
                     {sch.status === 'sudah_bertugas' ? 'Selesai' : 'Terjadwal'}
@@ -453,19 +479,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Audit Log Feed */}
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs">
+        <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b]">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-bold text-slate-900 text-sm">
+              <h3 className="font-display font-black text-slate-950 text-sm md:text-base">
                 Riwayat Aktivitas & Perubahan
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-600 font-medium">
                 Audit trail pencatatan absensi dan piket
               </p>
             </div>
             <button
               onClick={() => onNavigate('riwayat_aktivitas')}
-              className="text-xs font-semibold text-slate-600 hover:text-slate-900"
+              className="neo-btn px-2.5 py-1 bg-white text-xs font-bold text-slate-900 rounded-lg cursor-pointer"
             >
               Semua Log
             </button>
@@ -473,14 +499,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           <div className="space-y-3 text-xs">
             {auditLogs.slice(0, 4).map((log) => (
-              <div key={log.id} className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <div key={log.id} className="p-3 bg-[#FAF7F2] rounded-xl border border-slate-900/40 shadow-2xs">
                 <div className="flex items-center justify-between text-[11px]">
-                  <span className="font-semibold text-slate-800">{log.actorName}</span>
-                  <span className="text-slate-400 font-mono">
+                  <span className="font-bold text-slate-900">{log.actorName}</span>
+                  <span className="text-slate-500 font-mono font-medium">
                     {new Date(log.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
                   </span>
                 </div>
-                <p className="text-slate-600 mt-1">{log.details}</p>
+                <p className="text-slate-700 mt-1 font-medium">{log.details}</p>
               </div>
             ))}
           </div>

@@ -81,9 +81,14 @@ export const DataUstadzView: React.FC<DataUstadzViewProps> = ({
   };
 
   const handleDelete = async (u: Ustadz) => {
-    if (confirm(`Yakin ingin menghapus data Ustadz ${u.fullName}?`)) {
-      await deleteUstadz(u.id);
-      onRefresh();
+    if (confirm(`Apakah Anda yakin ingin menghapus data ${u.fullName}?`)) {
+      try {
+        await deleteUstadz(u.id);
+        onRefresh();
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        alert(`Gagal menghapus: ${msg}`);
+      }
     }
   };
 
@@ -92,12 +97,12 @@ export const DataUstadzView: React.FC<DataUstadzViewProps> = ({
       No: idx + 1,
       NIP: u.employeeNumber,
       Nama_Lengkap: u.fullName,
+      Bidang_Tugas: u.specialization || '-',
       No_HP_WA: u.phone,
       Email: u.email || '-',
-      Bidang_Tugas: u.specialization || '-',
       Status: u.isActive ? 'Aktif' : 'Nonaktif',
     }));
-    exportDataToExcel(data, 'Data_Ustadz_Ponpes_Baitul_Arqom');
+    exportDataToExcel(data, `Data_Ustadz_Ponpes_${new Date().toISOString().split('T')[0]}`);
   };
 
   const filteredList = ustadzList.filter((u) => {
@@ -118,33 +123,38 @@ export const DataUstadzView: React.FC<DataUstadzViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* View Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* View Header: Postmodern Neobrutalist Rounded Canvas */}
+      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <GraduationCap className="w-5 h-5 text-emerald-600" />
-            Data Ustadz & Ustadzah (Pembina Piket)
+          <div className="flex items-center gap-2 mb-1">
+            <span className="neo-badge px-3 py-0.5 text-[10px] font-black bg-[#E0F2FE] text-sky-950 uppercase tracking-wider inline-flex items-center gap-1">
+              <GraduationCap className="w-3.5 h-3.5 text-sky-700" />
+              Dewan Asatidz
+            </span>
+          </div>
+          <h2 className="font-display text-xl sm:text-2xl font-black text-slate-950 tracking-tight">
+            Data Ustadz &amp; Ustadzah (Pembina Piket)
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Daftar dewan guru dan pembina piket putra & putri Ponpes Baitul Arqom SMK Muhiba
+          <p className="text-xs text-slate-600 mt-0.5 font-medium">
+            Daftar dewan guru dan pembina piket putra &amp; putri Ponpes Baitul Arqom SMK Muhiba
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={handleExportExcel}
-            className="px-3 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl flex items-center gap-1.5 transition-colors"
+            className="neo-btn px-3.5 py-2 text-xs font-bold text-emerald-950 bg-[#DCFCE7] hover:bg-[#BBF7D0] rounded-xl flex items-center gap-1.5"
           >
-            <FileSpreadsheet className="w-3.5 h-3.5" />
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-800" />
             <span>Ekspor Excel</span>
           </button>
 
           {userRole === 'admin' && (
             <button
               onClick={handleOpenAdd}
-              className="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs flex items-center gap-1.5 transition-colors"
+              className="neo-btn px-4 py-2 text-xs font-black text-emerald-950 bg-[#BBF7D0] hover:bg-[#86EFAC] rounded-xl flex items-center gap-1.5 cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 text-emerald-900" />
               <span>Tambah Ustadz</span>
             </button>
           )}
@@ -152,15 +162,15 @@ export const DataUstadzView: React.FC<DataUstadzViewProps> = ({
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="bg-white p-4 border border-slate-200/80 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-[#FFFDF9] p-4 border-2 border-slate-900 rounded-2xl shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Cari berdasarkan nama, NIP, atau bidang tugas..."
-            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs bg-slate-50/50 focus:bg-white focus:outline-emerald-500"
+            className="w-full pl-9 pr-4 py-2 border-2 border-slate-900 rounded-xl text-xs bg-white text-slate-900 font-medium shadow-[1.5px_1.5px_0px_rgba(30,41,59,0.1)] outline-none"
           />
         </div>
 
@@ -168,7 +178,7 @@ export const DataUstadzView: React.FC<DataUstadzViewProps> = ({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
-            className="border border-slate-200 rounded-xl px-3 py-2 text-xs bg-white text-slate-700"
+            className="border-2 border-slate-900 rounded-xl px-3 py-2 text-xs bg-white text-slate-900 font-bold shadow-[1.5px_1.5px_0px_rgba(30,41,59,0.1)] outline-none"
           >
             <option value="all">Semua Status</option>
             <option value="active">Aktif</option>
@@ -177,46 +187,48 @@ export const DataUstadzView: React.FC<DataUstadzViewProps> = ({
         </div>
       </div>
 
-      {/* Ustadz Cards Grid */}
+      {/* Ustadz Cards Grid: Postmodern Neobrutalist Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredList.map((u) => (
           <div
             key={u.id}
-            className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs hover:border-slate-300 transition-all flex flex-col justify-between"
+            className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-5 shadow-[3.5px_3.5px_0px_#1e293b] hover:shadow-[4.5px_4.5px_0px_#1e293b] transition-all flex flex-col justify-between"
           >
             <div>
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#DCFCE7] border-1.5 border-slate-900 text-emerald-950 flex items-center justify-center font-black text-sm shrink-0 shadow-[1.5px_1.5px_0px_#1e293b]">
                     {u.fullName.split(' ')[1]?.[0] || 'U'}
                   </div>
                   <div className="min-w-0">
-                    <h4 className="font-bold text-slate-900 text-sm truncate" title={u.fullName}>{u.fullName}</h4>
-                    <p className="text-[11px] font-mono text-slate-400 truncate">{u.employeeNumber}</p>
+                    <h4 className="font-display font-black text-slate-950 text-sm truncate" title={u.fullName}>
+                      {u.fullName}
+                    </h4>
+                    <p className="text-[11px] font-mono font-medium text-slate-500 truncate">{u.employeeNumber}</p>
                   </div>
                 </div>
 
                 <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
-                    u.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                  className={`neo-badge px-2.5 py-0.5 text-[10px] font-black shrink-0 ${
+                    u.isActive ? 'bg-[#BBF7D0] text-emerald-950' : 'bg-slate-200 text-slate-700'
                   }`}
                 >
                   {u.isActive ? 'Aktif' : 'Nonaktif'}
                 </span>
               </div>
 
-              <div className="mt-4 space-y-1.5 text-xs text-slate-600">
+              <div className="mt-4 space-y-1.5 text-xs text-slate-700 font-medium">
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-slate-400 font-medium">Bidang:</span>
-                  <span className="font-medium text-slate-800">{u.specialization || 'Umum'}</span>
+                  <span className="text-[11px] text-slate-400 font-bold uppercase">Bidang:</span>
+                  <span className="font-bold text-slate-900">{u.specialization || 'Umum'}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Phone className="w-3.5 h-3.5 text-slate-400" />
+                  <Phone className="w-3.5 h-3.5 text-slate-500" />
                   <span>{u.phone || '-'}</span>
                 </div>
                 {u.email && (
                   <div className="flex items-center gap-2 truncate">
-                    <Mail className="w-3.5 h-3.5 text-slate-400" />
+                    <Mail className="w-3.5 h-3.5 text-slate-500" />
                     <span className="truncate">{u.email}</span>
                   </div>
                 )}
@@ -224,19 +236,19 @@ export const DataUstadzView: React.FC<DataUstadzViewProps> = ({
             </div>
 
             {userRole === 'admin' && (
-              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end gap-1">
+              <div className="flex items-center justify-end gap-1.5 mt-4 pt-3 border-t-2 border-slate-900/10">
                 <button
                   onClick={() => handleOpenEdit(u)}
-                  className="px-2.5 py-1 text-xs font-semibold text-blue-700 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1"
+                  className="neo-btn px-2.5 py-1 text-slate-900 bg-white hover:bg-slate-100 rounded-lg text-xs font-bold flex items-center gap-1 cursor-pointer"
                 >
-                  <Edit2 className="w-3 h-3" />
+                  <Edit2 className="w-3 h-3 text-slate-800" />
                   <span>Edit</span>
                 </button>
                 <button
                   onClick={() => handleDelete(u)}
-                  className="px-2.5 py-1 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1"
+                  className="neo-btn px-2.5 py-1 text-rose-950 bg-[#FFE4E6] hover:bg-[#FECDD3] rounded-lg text-xs font-bold flex items-center gap-1 cursor-pointer"
                 >
-                  <Trash2 className="w-3 h-3" />
+                  <Trash2 className="w-3 h-3 text-rose-800" />
                   <span>Hapus</span>
                 </button>
               </div>
@@ -245,101 +257,112 @@ export const DataUstadzView: React.FC<DataUstadzViewProps> = ({
         ))}
       </div>
 
-      {/* Modal Add / Edit */}
+      {/* Modal Add / Edit Ustadz */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 border border-slate-200">
-            <h3 className="text-base font-bold text-slate-900 mb-1">
-              {editingUstadz ? 'Edit Data Ustadz' : 'Tambah Ustadz Baru'}
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#FFFDF9] rounded-[2rem] shadow-[8px_8px_0px_#1e293b] w-full max-w-md p-6 sm:p-7 border-2 border-slate-900">
+            <h3 className="font-display text-lg font-black text-slate-950 mb-1">
+              {editingUstadz ? 'Edit Data Ustadz/ah' : 'Tambah Ustadz/ah Baru'}
             </h3>
-            <p className="text-xs text-slate-500 mb-4">
-              Lengkapi informasi guru atau pembina piket
+            <p className="text-xs text-slate-600 mb-4 font-medium">
+              Data pembina piket Ponpes Baitul Arqom SMK Muhiba
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Nomor Induk / NIP</label>
+                <label className="block font-bold text-slate-800 mb-1 uppercase text-[10px] tracking-wider">
+                  NIP / Nomor Pegawai
+                </label>
                 <input
                   type="text"
                   value={nip}
                   onChange={(e) => setNip(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2 font-mono"
+                  className="w-full border-2 border-slate-900 rounded-xl px-3 py-2 bg-white text-slate-900 font-mono font-bold shadow-[1.5px_1.5px_0px_rgba(30,41,59,0.1)] outline-none"
                   required
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Nama Lengkap & Gelar</label>
+                <label className="block font-bold text-slate-800 mb-1 uppercase text-[10px] tracking-wider">
+                  Nama Lengkap &amp; Gelar
+                </label>
                 <input
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Contoh: Ustadz Ahmad Fauzan, S.Pd.I"
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2"
+                  placeholder="Contoh: Ustadz Ahmad Dahlan, S.Pd.I"
+                  className="w-full border-2 border-slate-900 rounded-xl px-3 py-2 bg-white text-slate-900 font-bold shadow-[1.5px_1.5px_0px_rgba(30,41,59,0.1)] outline-none"
                   required
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Nomor HP / WhatsApp</label>
-                <input
-                  type="text"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="081234567890"
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2 font-mono"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Email (Opsional)</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="nama@smkmuhiba.sch.id"
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Bidang Tugas / Keahlian</label>
+                <label className="block font-bold text-slate-800 mb-1 uppercase text-[10px] tracking-wider">
+                  Bidang Keahlian / Tugas
+                </label>
                 <input
                   type="text"
                   value={specialization}
                   onChange={(e) => setSpecialization(e.target.value)}
-                  placeholder="Tahfidz, Fiqih, Kesantrian"
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2"
+                  placeholder="Contoh: Tahfidz Al-Qur'an & Bahasa Arab"
+                  className="w-full border-2 border-slate-900 rounded-xl px-3 py-2 bg-white text-slate-900 font-medium shadow-[1.5px_1.5px_0px_rgba(30,41,59,0.1)] outline-none"
                 />
               </div>
 
-              <div className="flex items-center gap-2 pt-1">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-800 mb-1 uppercase text-[10px] tracking-wider">
+                    Nomor WhatsApp / HP
+                  </label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="081234567890"
+                    className="w-full border-2 border-slate-900 rounded-xl px-3 py-2 bg-white text-slate-900 font-mono shadow-[1.5px_1.5px_0px_rgba(30,41,59,0.1)] outline-none"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-800 mb-1 uppercase text-[10px] tracking-wider">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="ustadz@muhiba.sch.id"
+                    className="w-full border-2 border-slate-900 rounded-xl px-3 py-2 bg-white text-slate-900 shadow-[1.5px_1.5px_0px_rgba(30,41,59,0.1)] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
                 <input
                   type="checkbox"
-                  id="isActiveCheck"
+                  id="isActive"
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
-                  className="rounded text-emerald-600"
+                  className="w-4 h-4 rounded text-emerald-600 border-2 border-slate-900 cursor-pointer"
                 />
-                <label htmlFor="isActiveCheck" className="font-semibold text-slate-700 cursor-pointer">
-                  Status Ustadz Aktif (Mendapatkan Jadwal Piket)
+                <label htmlFor="isActive" className="font-bold text-slate-800 cursor-pointer text-xs">
+                  Status Aktif Bertugas Piket
                 </label>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2 pt-4 border-t-2 border-slate-900/10">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-semibold"
+                  className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-xl font-bold cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl font-bold shadow-xs"
+                  className="neo-btn px-4 py-2 text-emerald-950 bg-[#BBF7D0] hover:bg-[#86EFAC] rounded-xl font-black cursor-pointer"
                 >
-                  Simpan Data
+                  {editingUstadz ? 'Perbarui Data' : 'Simpan Data'}
                 </button>
               </div>
             </form>
