@@ -326,6 +326,7 @@ export default function App() {
                     settings={settings}
                     userRole="admin"
                     onRefresh={refreshAllData}
+                    ustadzList={ustadzList}
                   />
                 )}
               </>

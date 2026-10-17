@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Printer, Download, FileSpreadsheet, X, Loader2 } from 'lucide-react';
 import { AppSettings, ReportType, Ustadz, Santri, PiketSchedule, ActivitySession, StudentAttendance } from '../types';
 import { KopSurat } from './KopSurat';
-import { generatePesantrenPDF } from '../lib/pdf';
+import { generatePesantrenPDF, formatDocumentDate } from '../lib/pdf';
 import { exportDataToExcel } from '../lib/excel';
 
 interface ReportPreviewModalProps {
@@ -316,7 +316,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
 
               <div className="text-center">
                 <p>
-                  Babat, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  {formatDocumentDate(settings).fullTitimangsa}
                 </p>
                 <p className="font-semibold mt-1">Pimpinan Pondok Pesantren</p>
                 <div className="h-16"></div>

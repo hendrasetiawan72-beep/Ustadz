@@ -20,6 +20,39 @@ export interface PDFReportOptions {
   };
 }
 
+export function formatDocumentDate(settings: AppSettings): { city: string; dateStr: string; fullTitimangsa: string } {
+  const city = (settings.documentCity || 'Bawang').trim();
+  let dateStr = '';
+  if (settings.documentDateMode === 'manual' && settings.manualDocumentDate) {
+    try {
+      const d = new Date(settings.manualDocumentDate);
+      if (!isNaN(d.getTime())) {
+        dateStr = d.toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        });
+      } else {
+        dateStr = settings.manualDocumentDate;
+      }
+    } catch {
+      dateStr = settings.manualDocumentDate;
+    }
+  } else {
+    dateStr = new Date().toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  }
+
+  return {
+    city,
+    dateStr,
+    fullTitimangsa: `${city}, ${dateStr}`,
+  };
+}
+
 // Convert image url to base64 for jsPDF
 export async function getBase64ImageFromUrl(imageUrl: string): Promise<string | null> {
   if (!imageUrl) return null;
@@ -394,12 +427,8 @@ export async function generatePesantrenPDF(options: PDFReportOptions): Promise<j
   doc.text('Koordinator Piket & Kesantrian', sigLeftX, signatureY + 4, { align: 'center' });
 
   // Right Signature: Pimpinan Ponpes
-  const todayIndo = new Date().toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-  doc.text(`Babat, ${todayIndo}`, sigRightX, signatureY, { align: 'center' });
+  const titimangsa = formatDocumentDate(settings);
+  doc.text(titimangsa.fullTitimangsa, sigRightX, signatureY, { align: 'center' });
   doc.text('Pimpinan Pondok Pesantren', sigRightX, signatureY + 4, { align: 'center' });
 
   // Signature names & NIP (after spacing for ink signature)

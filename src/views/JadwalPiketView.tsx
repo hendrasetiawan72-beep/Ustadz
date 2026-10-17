@@ -12,8 +12,13 @@ import {
   Edit2,
   Clock,
   Filter,
+  Repeat,
+  Sparkles,
+  Calendar,
+  X,
+  Check,
 } from 'lucide-react';
-import { Ustadz, PiketSchedule, AppSettings } from '../types';
+import { Ustadz, PiketSchedule, AppSettings, RecurringScheduleItem } from '../types';
 import {
   addPiketSchedule,
   updatePiketSchedule,
@@ -21,7 +26,10 @@ import {
   checkWeeklyDutyConflict,
   getStartOfWeek,
   getDayIndoName,
+  generateRecurringPiketSchedules,
+  updateAppSettings,
 } from '../lib/db';
+import { DEFAULT_RECURRING_TEMPLATE } from '../lib/constants';
 import { exportDataToExcel } from '../lib/excel';
 
 interface JadwalPiketViewProps {
@@ -55,7 +63,112 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
   const [conflictWarning, setConflictWarning] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Recurring Schedule Management State
+  const [isRecurringModalOpen, setIsRecurringModalOpen] = useState(false);
+  const [recurringActiveTab, setRecurringActiveTab] = useState<'generate' | 'pola'>('generate');
+  const [recurringTemplate, setRecurringTemplate] = useState<RecurringScheduleItem[]>(() => {
+    return settings.recurringTemplate && settings.recurringTemplate.length > 0
+      ? settings.recurringTemplate
+      : DEFAULT_RECURRING_TEMPLATE;
+  });
+  const [periodType, setPeriodType] = useState<'this_month' | 'next_month' | 'custom_month' | 'custom_range'>('this_month');
+  const [customMonth, setCustomMonth] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  });
+  const [customStartDate, setCustomStartDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [customEndDate, setCustomEndDate] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 1);
+    return d.toISOString().split('T')[0];
+  });
+  const [overwriteExisting, setOverwriteExisting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generateFeedback, setGenerateFeedback] = useState<string | null>(null);
+
   const todayStr = new Date().toISOString().split('T')[0];
+
+  const handleDayPatternChange = (dayIndex: number, field: keyof RecurringScheduleItem, val: unknown) => {
+    setRecurringTemplate((prev) => {
+      const updated = [...prev];
+      const item = { ...updated[dayIndex], [field]: val };
+      if (field === 'ustadzId') {
+        const found = ustadzList.find((u) => u.id === val);
+        item.ustadzName = found?.fullName || '';
+      }
+      updated[dayIndex] = item;
+      return updated;
+    });
+  };
+
+  const handleSavePatternFromModal = async () => {
+    try {
+      await updateAppSettings({
+        ...settings,
+        recurringTemplate,
+      });
+      alert('Pola jadwal piket berulang mingguan berhasil disimpan!');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      alert(`Gagal menyimpan pola: ${msg}`);
+    }
+  };
+
+  const handleExecuteGenerate = async () => {
+    try {
+      setIsGenerating(true);
+      setGenerateFeedback(null);
+
+      let startDate = '';
+      let endDate = '';
+
+      if (periodType === 'this_month') {
+        const now = new Date();
+        const first = new Date(now.getFullYear(), now.getMonth(), 1);
+        const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        startDate = first.toISOString().split('T')[0];
+        endDate = last.toISOString().split('T')[0];
+      } else if (periodType === 'next_month') {
+        const now = new Date();
+        const first = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        const last = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+        startDate = first.toISOString().split('T')[0];
+        endDate = last.toISOString().split('T')[0];
+      } else if (periodType === 'custom_month') {
+        const [y, m] = customMonth.split('-').map(Number);
+        const first = new Date(y, m - 1, 1);
+        const last = new Date(y, m, 0);
+        startDate = first.toISOString().split('T')[0];
+        endDate = last.toISOString().split('T')[0];
+      } else {
+        startDate = customStartDate;
+        endDate = customEndDate;
+      }
+
+      // Ensure template is saved to settings
+      await updateAppSettings({
+        ...settings,
+        recurringTemplate,
+      });
+
+      const res = await generateRecurringPiketSchedules({
+        startDate,
+        endDate,
+        template: recurringTemplate,
+        overwriteExisting,
+      });
+
+      setGenerateFeedback(
+        `Alhamdulillah! Berhasil men-generate jadwal: ${res.totalCreated} jadwal baru dibuat, ${res.totalUpdated} diperbarui, ${res.totalSkipped} jadwal lama dipertahankan.`
+      );
+      onRefresh();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      alert(`Gagal generate jadwal: ${msg}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleDateOrUstadzChange = async (uId: string, dStr: string, excludeId?: string) => {
     setFormUstadzId(uId);
@@ -247,6 +360,14 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
           </button>
 
           <button
+            onClick={() => setIsRecurringModalOpen(true)}
+            className="neo-btn px-3.5 py-2 text-xs font-black text-purple-950 bg-[#EDE9FE] hover:bg-[#DDD6FE] rounded-xl flex items-center gap-1.5 cursor-pointer"
+          >
+            <Repeat className="w-3.5 h-3.5 text-purple-700" />
+            <span>Jadwal Berulang Otomatis</span>
+          </button>
+
+          <button
             onClick={handleOpenAdd}
             className="neo-btn px-4 py-2 text-xs font-black text-emerald-950 bg-[#BBF7D0] hover:bg-[#86EFAC] rounded-xl flex items-center gap-1.5 cursor-pointer"
           >
@@ -254,6 +375,33 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
             <span>Tambah Jadwal</span>
           </button>
         </div>
+      </div>
+
+      {/* Quick Recurring Alert / Generator Banner */}
+      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-4 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-[#EDE9FE] border border-slate-900 flex items-center justify-center shrink-0 text-purple-800 shadow-[1.5px_1.5px_0px_#1e293b]">
+            <Repeat className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-display font-black text-slate-950 text-xs flex items-center gap-2">
+              <span>Pola Jadwal Berulang Otomatis (Senin s/d Ahad)</span>
+              <span className="neo-badge px-2 py-0.2 text-[9px] font-black bg-[#BBF7D0] text-emerald-950">
+                Solusi Cepat
+              </span>
+            </p>
+            <p className="text-[11px] text-slate-600 font-medium truncate sm:whitespace-normal">
+              Tidak perlu menginput manual setiap hari. Tetapkan pola jadwal mingguan dan terapkan ke seluruh bulan dalam 1 klik!
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={() => setIsRecurringModalOpen(true)}
+          className="neo-btn px-3.5 py-2 font-black text-xs text-purple-950 bg-[#DDD6FE] hover:bg-[#C4B5FD] rounded-xl flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-purple-800" />
+          <span>Buka Pengaturan Berulang</span>
+        </button>
       </div>
 
       {/* Session Filter Tabs */}
@@ -577,6 +725,367 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Recurring Schedule Modal */}
+      {isRecurringModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-[#FFFDF9] rounded-[2rem] border-2 border-slate-900 shadow-[8px_8px_0px_#1e293b] w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-[#EDE9FE] border-b-2 border-slate-900 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white text-purple-900 rounded-xl border border-slate-900 shadow-[2px_2px_0px_#1e293b]">
+                  <Repeat className="w-5 h-5 text-purple-800" />
+                </div>
+                <div>
+                  <h3 className="font-display font-black text-slate-950 text-base">
+                    Jadwal Piket Berulang Otomatis
+                  </h3>
+                  <p className="text-xs text-purple-900/80 font-medium">
+                    Terapkan pola mingguan ke kalender satu bulan penuh tanpa input manual berulang
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsRecurringModalOpen(false);
+                  setGenerateFeedback(null);
+                }}
+                className="p-1.5 text-slate-700 hover:text-slate-950 hover:bg-white rounded-lg transition-colors cursor-pointer border border-slate-900/30"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Tab Switcher */}
+            <div className="bg-[#FAF7F2] border-b-2 border-slate-900/10 px-6 py-2.5 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setRecurringActiveTab('generate')}
+                className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                  recurringActiveTab === 'generate'
+                    ? 'bg-white text-purple-950 border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b]'
+                    : 'text-slate-600 hover:text-slate-900 border border-transparent'
+                }`}
+              >
+                ⚡ 1. Generate Jadwal Otomatis
+              </button>
+              <button
+                type="button"
+                onClick={() => setRecurringActiveTab('pola')}
+                className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                  recurringActiveTab === 'pola'
+                    ? 'bg-white text-purple-950 border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b]'
+                    : 'text-slate-600 hover:text-slate-900 border border-transparent'
+                }`}
+              >
+                ⚙️ 2. Atur Pola Mingguan (Senin - Ahad)
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-5 text-xs">
+              {generateFeedback && (
+                <div className="p-4 bg-[#DCFCE7] border-2 border-slate-900 rounded-xl flex items-center gap-2 text-emerald-950 text-xs font-bold shadow-[2px_2px_0px_#1e293b]">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                  <span>{generateFeedback}</span>
+                </div>
+              )}
+
+              {recurringActiveTab === 'generate' ? (
+                <div className="space-y-5">
+                  {/* Period Selection */}
+                  <div className="space-y-3">
+                    <label className="block font-bold text-slate-900 uppercase text-[10px] tracking-wider">
+                      Pilih Periode Target Pembuatan Jadwal:
+                    </label>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => setPeriodType('this_month')}
+                        className={`p-3 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                          periodType === 'this_month'
+                            ? 'border-slate-900 bg-[#BBF7D0] text-emerald-950 shadow-[2px_2px_0px_#1e293b] font-black'
+                            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400 font-bold'
+                        }`}
+                      >
+                        <span className="block text-xs">Bulan Berjalan</span>
+                        <span className="block text-[10px] opacity-80 mt-0.5 font-normal">
+                          {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setPeriodType('next_month')}
+                        className={`p-3 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                          periodType === 'next_month'
+                            ? 'border-slate-900 bg-[#BBF7D0] text-emerald-950 shadow-[2px_2px_0px_#1e293b] font-black'
+                            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400 font-bold'
+                        }`}
+                      >
+                        <span className="block text-xs">Bulan Depan</span>
+                        <span className="block text-[10px] opacity-80 mt-0.5 font-normal">
+                          {(() => {
+                            const d = new Date();
+                            d.setMonth(d.getMonth() + 1);
+                            return d.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+                          })()}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setPeriodType('custom_month')}
+                        className={`p-3 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                          periodType === 'custom_month'
+                            ? 'border-slate-900 bg-[#FEF08A] text-amber-950 shadow-[2px_2px_0px_#1e293b] font-black'
+                            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400 font-bold'
+                        }`}
+                      >
+                        <span className="block text-xs">Pilih Bulan</span>
+                        <span className="block text-[10px] opacity-80 mt-0.5 font-normal">Bulan Kalender</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setPeriodType('custom_range')}
+                        className={`p-3 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                          periodType === 'custom_range'
+                            ? 'border-slate-900 bg-[#E0F2FE] text-sky-950 shadow-[2px_2px_0px_#1e293b] font-black'
+                            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400 font-bold'
+                        }`}
+                      >
+                        <span className="block text-xs">Rentang Tanggal</span>
+                        <span className="block text-[10px] opacity-80 mt-0.5 font-normal">Custom Dari - Sampai</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Input for custom month */}
+                  {periodType === 'custom_month' && (
+                    <div className="p-3.5 bg-white border-2 border-slate-900 rounded-xl shadow-[2px_2px_0px_#1e293b]">
+                      <label className="block font-bold text-slate-800 mb-1.5 uppercase text-[10px]">
+                        Tentukan Bulan &amp; Tahun:
+                      </label>
+                      <input
+                        type="month"
+                        value={customMonth}
+                        onChange={(e) => setCustomMonth(e.target.value)}
+                        className="border-2 border-slate-900 rounded-xl px-3 py-1.5 font-mono font-bold bg-white text-slate-900 outline-none"
+                      />
+                    </div>
+                  )}
+
+                  {/* Input for custom range */}
+                  {periodType === 'custom_range' && (
+                    <div className="p-3.5 bg-white border-2 border-slate-900 rounded-xl shadow-[2px_2px_0px_#1e293b] grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-bold text-slate-800 mb-1.5 uppercase text-[10px]">
+                          Dari Tanggal:
+                        </label>
+                        <input
+                          type="date"
+                          value={customStartDate}
+                          onChange={(e) => setCustomStartDate(e.target.value)}
+                          className="w-full border-2 border-slate-900 rounded-xl px-3 py-1.5 font-mono font-bold bg-white text-slate-900 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-bold text-slate-800 mb-1.5 uppercase text-[10px]">
+                          Sampai Tanggal:
+                        </label>
+                        <input
+                          type="date"
+                          value={customEndDate}
+                          onChange={(e) => setCustomEndDate(e.target.value)}
+                          className="w-full border-2 border-slate-900 rounded-xl px-3 py-1.5 font-mono font-bold bg-white text-slate-900 outline-none"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Active Pattern Summary Card */}
+                  <div className="p-4 bg-[#FAF7F2] border-2 border-slate-900 rounded-xl shadow-[2.5px_2.5px_0px_#1e293b] space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="font-display font-black text-slate-900 text-xs">
+                        Pola Petugas yang Akan Diterapkan:
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setRecurringActiveTab('pola')}
+                        className="text-purple-700 hover:text-purple-900 font-bold text-[11px] underline cursor-pointer"
+                      >
+                        Ubah Pola
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                      {recurringTemplate.map((item) => (
+                        <div
+                          key={item.dayOfWeek}
+                          className={`p-2 rounded-xl border ${
+                            item.isEnabled
+                              ? 'bg-white border-slate-900/60 shadow-2xs'
+                              : 'bg-slate-100 border-slate-300 opacity-50'
+                          }`}
+                        >
+                          <span className="block font-black text-slate-900 text-[11px]">
+                            {item.dayName}
+                          </span>
+                          <span className="block font-bold text-emerald-800 text-[10px] truncate">
+                            {item.ustadzName || 'Belum diatur'}
+                          </span>
+                          <span className="block text-[9px] text-slate-500">
+                            {item.sessionType === 'both' ? 'Malam & Pagi' : item.sessionType === 'night' ? 'Malam' : 'Pagi'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Overwrite option */}
+                  <div className="p-3 bg-white border border-slate-900/30 rounded-xl flex items-start gap-2.5">
+                    <input
+                      type="checkbox"
+                      id="chk-overwrite"
+                      checked={overwriteExisting}
+                      onChange={(e) => setOverwriteExisting(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded accent-emerald-600 cursor-pointer"
+                    />
+                    <label htmlFor="chk-overwrite" className="cursor-pointer text-slate-800">
+                      <span className="block font-bold">Timpa / Perbarui jadwal yang sudah ada pada periode tersebut</span>
+                      <span className="block text-[11px] text-slate-500">
+                        Jika tidak dicentang (default), tanggal yang sudah memiliki jadwal piket khusus akan tetap dipertahankan dan dilewati.
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              ) : (
+                /* Tab 2: Edit Weekly Pattern */
+                <div className="space-y-4">
+                  <p className="text-slate-600 font-medium">
+                    Tentukan pembagian tugas ustadz/ustadzah untuk masing-masing hari. Pola ini akan menjadi acuan saat jadwal di-generate.
+                  </p>
+
+                  <div className="border-2 border-slate-900 rounded-xl overflow-hidden bg-white shadow-[2px_2px_0px_#1e293b]">
+                    <div className="overflow-x-auto w-full">
+                      <table className="w-full text-left border-collapse text-xs min-w-[550px]">
+                        <thead>
+                          <tr className="bg-[#FAF7F2] border-b-2 border-slate-900/20 text-slate-900 font-black">
+                            <th className="p-2.5 w-24">Hari</th>
+                            <th className="p-2.5 w-16 text-center">Aktif</th>
+                            <th className="p-2.5">Petugas Piket</th>
+                            <th className="p-2.5 w-40">Sesi</th>
+                            <th className="p-2.5">Catatan</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200">
+                          {recurringTemplate.map((item, idx) => (
+                            <tr key={item.dayOfWeek} className="hover:bg-slate-50">
+                              <td className="p-2.5 font-display font-black text-slate-950">
+                                {item.dayName}
+                              </td>
+                              <td className="p-2.5 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={item.isEnabled}
+                                  onChange={(e) =>
+                                    handleDayPatternChange(idx, 'isEnabled', e.target.checked)
+                                  }
+                                  className="w-4 h-4 rounded accent-emerald-600 cursor-pointer"
+                                />
+                              </td>
+                              <td className="p-2.5">
+                                <select
+                                  value={item.ustadzId}
+                                  onChange={(e) =>
+                                    handleDayPatternChange(idx, 'ustadzId', e.target.value)
+                                  }
+                                  disabled={!item.isEnabled}
+                                  className="w-full border border-slate-900 rounded-lg px-2 py-1 bg-white font-bold text-xs disabled:opacity-40"
+                                >
+                                  <option value="">-- Pilih Ustadz/ah --</option>
+                                  {ustadzList.map((u) => (
+                                    <option key={u.id} value={u.id}>
+                                      {u.fullName} {u.gender === 'P' ? '(Ustadzah)' : '(Ustadz)'}
+                                    </option>
+                                  ))}
+                                </select>
+                              </td>
+                              <td className="p-2.5">
+                                <select
+                                  value={item.sessionType}
+                                  onChange={(e) =>
+                                    handleDayPatternChange(idx, 'sessionType', e.target.value)
+                                  }
+                                  disabled={!item.isEnabled}
+                                  className="w-full border border-slate-900 rounded-lg px-2 py-1 bg-white font-bold text-xs disabled:opacity-40"
+                                >
+                                  <option value="both">Malam &amp; Pagi</option>
+                                  <option value="night">Malam Saja</option>
+                                  <option value="morning">Pagi Saja</option>
+                                </select>
+                              </td>
+                              <td className="p-2.5">
+                                <input
+                                  type="text"
+                                  value={item.notes || ''}
+                                  onChange={(e) =>
+                                    handleDayPatternChange(idx, 'notes', e.target.value)
+                                  }
+                                  disabled={!item.isEnabled}
+                                  placeholder="Catatan rutin..."
+                                  className="w-full border border-slate-300 rounded-lg px-2 py-1 bg-white text-xs disabled:opacity-40"
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleSavePatternFromModal}
+                      className="neo-btn px-4 py-2 bg-[#BBF7D0] hover:bg-[#86EFAC] text-emerald-950 font-black rounded-xl cursor-pointer"
+                    >
+                      Simpan Perubahan Pola
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-[#FAF7F2] border-t-2 border-slate-900/10 px-6 py-4 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsRecurringModalOpen(false);
+                  setGenerateFeedback(null);
+                }}
+                className="px-4 py-2 text-slate-700 hover:bg-slate-200 rounded-xl font-bold cursor-pointer"
+              >
+                Tutup
+              </button>
+
+              {recurringActiveTab === 'generate' && (
+                <button
+                  type="button"
+                  onClick={handleExecuteGenerate}
+                  disabled={isGenerating}
+                  className="neo-btn px-5 py-2.5 text-xs font-black text-purple-950 bg-[#DDD6FE] hover:bg-[#C4B5FD] disabled:opacity-50 rounded-xl flex items-center gap-2 cursor-pointer shadow-[2.5px_2.5px_0px_#1e293b]"
+                >
+                  <Sparkles className="w-4 h-4 text-purple-800" />
+                  <span>{isGenerating ? 'Sedang Memproses...' : '🚀 Generate Jadwal Otomatis Sekarang'}</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}

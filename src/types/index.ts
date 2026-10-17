@@ -141,7 +141,25 @@ export interface AppSettings {
   dutySupervisorName: string; // Nama Koordinator Piket
   dutySupervisorNip: string;
   kopLetterheadEnabled: boolean;
+  // Pengaturan Tempat dan Tanggal Dokumen Siap Cetak
+  documentCity?: string; // Contoh: 'Bawang' atau 'Bawang, Batang'
+  documentDateMode?: 'auto' | 'manual'; // 'auto' = tanggal hari ini saat cetak, 'manual' = tanggal ditentukan manual
+  manualDocumentDate?: string; // Tanggal manual (YYYY-MM-DD atau teks)
+  // Pengaturan Pola Jadwal Berulang Mingguan
+  recurringTemplate?: RecurringScheduleItem[];
 }
+
+export interface RecurringScheduleItem {
+  dayOfWeek: number; // 0 = Ahad, 1 = Senin, 2 = Selasa, 3 = Rabu, 4 = Kamis, 5 = Jumat, 6 = Sabtu
+  dayName: string; // 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Ahad'
+  ustadzId: string;
+  ustadzName?: string;
+  sessionType: 'night' | 'morning' | 'both';
+  notes?: string;
+  isEnabled: boolean;
+}
+
+export type RecurringScheduleTemplate = RecurringScheduleItem[];
 
 export type ReportType =
   | 'jadwal_mingguan'

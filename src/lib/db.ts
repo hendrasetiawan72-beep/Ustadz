@@ -7,9 +7,11 @@ import {
   StudentAttendance,
   AuditLog,
   PiketRealization,
+  RecurringScheduleItem,
 } from '../types';
 import {
   DEFAULT_SETTINGS,
+  DEFAULT_RECURRING_TEMPLATE,
   OFFICIAL_LOGO_URL,
   INITIAL_USTADZ,
   INITIAL_SANTRI,
@@ -29,6 +31,7 @@ const STORAGE_KEYS = {
   SESSIONS: 'ponpes_sessions',
   ATTENDANCE: 'ponpes_attendance',
   AUDIT: 'ponpes_audit_logs',
+  RECURRING_TEMPLATE: 'ponpes_recurring_template',
 };
 
 // Helpers for localStorage
@@ -82,6 +85,10 @@ export async function getAppSettings(): Promise<AppSettings> {
           dutySupervisorName: data.duty_supervisor_name || DEFAULT_SETTINGS.dutySupervisorName,
           dutySupervisorNip: data.duty_supervisor_nip || DEFAULT_SETTINGS.dutySupervisorNip,
           kopLetterheadEnabled: data.kop_letterhead_enabled ?? true,
+          documentCity: data.document_city || DEFAULT_SETTINGS.documentCity,
+          documentDateMode: data.document_date_mode || DEFAULT_SETTINGS.documentDateMode,
+          manualDocumentDate: data.manual_document_date || DEFAULT_SETTINGS.manualDocumentDate,
+          recurringTemplate: data.recurring_template || DEFAULT_SETTINGS.recurringTemplate,
         };
       }
     } catch {
@@ -90,10 +97,15 @@ export async function getAppSettings(): Promise<AppSettings> {
   }
   const local = loadLocal<AppSettings>(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
   return {
+    ...DEFAULT_SETTINGS,
     ...local,
     institutionName: local.institutionName || DEFAULT_SETTINGS.institutionName,
     subTitle: local.subTitle || DEFAULT_SETTINGS.subTitle,
     logoUrl: OFFICIAL_LOGO_URL, // Terkunci permanen dengan logo resmi
+    documentCity: local.documentCity || DEFAULT_SETTINGS.documentCity,
+    documentDateMode: local.documentDateMode || DEFAULT_SETTINGS.documentDateMode,
+    manualDocumentDate: local.manualDocumentDate || DEFAULT_SETTINGS.manualDocumentDate,
+    recurringTemplate: local.recurringTemplate && local.recurringTemplate.length > 0 ? local.recurringTemplate : DEFAULT_RECURRING_TEMPLATE,
   };
 }
 
@@ -645,6 +657,132 @@ export async function deletePiketSchedule(id: string): Promise<void> {
       details: `Menghapus jadwal piket: ${target.ustadzName} tanggal ${target.scheduleDate}.`,
     });
   }
+}
+
+export async function generateRecurringPiketSchedules(options: {
+  startDate: string; // YYYY-MM-DD
+  endDate: string; // YYYY-MM-DD
+  template: RecurringScheduleItem[];
+  overwriteExisting: boolean;
+}): Promise<{ totalCreated: number; totalUpdated: number; totalSkipped: number }> {
+  const { startDate, endDate, template, overwriteExisting } = options;
+  const currentSchedules = await getPiketSchedules();
+  const ustadzList = await getUstadzList();
+  const ustadzMap = new Map(ustadzList.map((u) => [u.id, u.fullName]));
+
+  // Map template by dayOfWeek
+  const templateByDay = new Map<number, RecurringScheduleItem>();
+  template.forEach((item) => {
+    if (item.isEnabled && item.ustadzId) {
+      templateByDay.set(item.dayOfWeek, item);
+    }
+  });
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  if (start > end) {
+    throw new Error('Tanggal mulai tidak boleh melebihi tanggal selesai.');
+  }
+
+  let totalCreated = 0;
+  let totalUpdated = 0;
+  let totalSkipped = 0;
+
+  const schedulesMap = new Map<string, PiketSchedule>();
+  currentSchedules.forEach((s) => {
+    schedulesMap.set(s.scheduleDate, s);
+  });
+
+  const updatedList: PiketSchedule[] = [...currentSchedules];
+
+  // Loop through days
+  const cur = new Date(start);
+  while (cur <= end) {
+    const dateStr = cur.toISOString().split('T')[0];
+    const dayOfWeek = cur.getDay(); // 0 = Ahad, 1 = Senin, ...
+    const pattern = templateByDay.get(dayOfWeek);
+
+    if (pattern) {
+      const existing = schedulesMap.get(dateStr);
+      const uName = ustadzMap.get(pattern.ustadzId) || pattern.ustadzName || 'Ustadz Piket';
+      const dayName = getDayIndoName(dateStr);
+      const weekStart = getStartOfWeek(dateStr);
+
+      if (existing) {
+        if (overwriteExisting) {
+          const idx = updatedList.findIndex((s) => s.id === existing.id);
+          if (idx !== -1) {
+            updatedList[idx] = {
+              ...existing,
+              ustadzId: pattern.ustadzId,
+              ustadzName: uName,
+              sessionType: pattern.sessionType || 'both',
+              notes: pattern.notes || existing.notes || 'Jadwal berulang otomatis',
+              updatedAt: new Date().toISOString(),
+            };
+            totalUpdated++;
+          }
+        } else {
+          totalSkipped++;
+        }
+      } else {
+        const newSchedule: PiketSchedule = {
+          id: `sch-rec-${dateStr}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          ustadzId: pattern.ustadzId,
+          ustadzName: uName,
+          scheduleDate: dateStr,
+          sessionType: pattern.sessionType || 'both',
+          dayName,
+          weekStart,
+          status: 'terjadwal',
+          notes: pattern.notes || 'Jadwal berulang otomatis',
+          createdBy: 'admin',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        updatedList.push(newSchedule);
+        schedulesMap.set(dateStr, newSchedule);
+        totalCreated++;
+      }
+    }
+
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  // Sort by date ascending
+  updatedList.sort((a, b) => a.scheduleDate.localeCompare(b.scheduleDate));
+  saveLocal(STORAGE_KEYS.SCHEDULES, updatedList);
+
+  const supabase = getSupabaseClient();
+  if (supabase && (totalCreated > 0 || totalUpdated > 0)) {
+    try {
+      const upsertRows = updatedList.map((s) => ({
+        id: s.id,
+        ustadz_id: s.ustadzId,
+        schedule_date: s.scheduleDate,
+        session_type: s.sessionType,
+        day_name: s.dayName,
+        week_start: s.weekStart,
+        status: s.status,
+        notes: s.notes,
+        created_by: s.createdBy,
+      }));
+      await supabase.from('piket_schedule').upsert(upsertRows);
+    } catch (e) {
+      console.warn('Supabase batch upsert failed:', e);
+    }
+  }
+
+  await addAuditLog({
+    actorId: 'admin',
+    actorName: 'Admin Pondok',
+    action: 'GENERATE_JADWAL_BERULANG',
+    entityType: 'piket_schedule',
+    details: `Men-generate jadwal berulang periode ${startDate} s/d ${endDate}: ${totalCreated} baru, ${totalUpdated} diperbarui, ${totalSkipped} dilewati.`,
+  });
+
+  return { totalCreated, totalUpdated, totalSkipped };
 }
 
 // ==========================================

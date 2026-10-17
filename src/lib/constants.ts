@@ -1,6 +1,72 @@
-import { AppSettings, Ustadz, Santri, PiketSchedule, ActivitySession, StudentAttendance, AuditLog, UserProfile } from '../types';
+import { AppSettings, Ustadz, Santri, PiketSchedule, ActivitySession, StudentAttendance, AuditLog, UserProfile, RecurringScheduleItem } from '../types';
 
 export const OFFICIAL_LOGO_URL = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiAYTmhJlYOEw9QBmw37zoslhqCo90hAtJ4c2Nk6yGXvojklwqPR9E19OVqQxMha2HO6aWrDP1cCdfuXA1m0ViCS73bq5qrrMdtUtplJzc6217uJFTu9Sm-yqU7ZzSNeXwmFS0lVid02IhAPrxI4n0bS10I9WzbDhKYOcpbHypygt646fCspHvud7AobY0B/s640/44709.jpg';
+
+export const DEFAULT_RECURRING_TEMPLATE: RecurringScheduleItem[] = [
+  {
+    dayOfWeek: 1,
+    dayName: 'Senin',
+    ustadzId: 'ust-001',
+    ustadzName: 'Ustadz Muhammad Ridwan, S.Pd.I',
+    sessionType: 'both',
+    notes: 'Piket rutin Senin (Kajian & Sholat Berjamaah)',
+    isEnabled: true,
+  },
+  {
+    dayOfWeek: 2,
+    dayName: 'Selasa',
+    ustadzId: 'ust-002',
+    ustadzName: 'Ustadzah Siti Aisyah, S.Pd.I',
+    sessionType: 'both',
+    notes: 'Piket rutin Selasa (Kajian & Sholat Berjamaah)',
+    isEnabled: true,
+  },
+  {
+    dayOfWeek: 3,
+    dayName: 'Rabu',
+    ustadzId: 'ust-003',
+    ustadzName: 'Ustadz Fauzan Azhim, Lc',
+    sessionType: 'both',
+    notes: 'Piket rutin Rabu (Kajian & Sholat Berjamaah)',
+    isEnabled: true,
+  },
+  {
+    dayOfWeek: 4,
+    dayName: 'Kamis',
+    ustadzId: 'ust-004',
+    ustadzName: 'Ustadzah Nurul Hidayati, M.Ag',
+    sessionType: 'both',
+    notes: 'Piket rutin Kamis (Kajian & Sholat Berjamaah)',
+    isEnabled: true,
+  },
+  {
+    dayOfWeek: 5,
+    dayName: 'Jumat',
+    ustadzId: 'ust-005',
+    ustadzName: 'Ustadz Bilal Ramadhan, S.Pd',
+    sessionType: 'both',
+    notes: 'Piket rutin Jumat (Kajian & Sholat Berjamaah)',
+    isEnabled: true,
+  },
+  {
+    dayOfWeek: 6,
+    dayName: 'Sabtu',
+    ustadzId: 'ust-006',
+    ustadzName: 'Ustadzah Khadijah Al-Kubro, S.Pd',
+    sessionType: 'both',
+    notes: 'Piket rutin Sabtu (Kajian & Sholat Berjamaah)',
+    isEnabled: true,
+  },
+  {
+    dayOfWeek: 0,
+    dayName: 'Ahad',
+    ustadzId: 'ust-007',
+    ustadzName: 'Ustadz Hamzah Al-Farisi, S.T',
+    sessionType: 'both',
+    notes: 'Piket rutin Ahad (Kajian & Sholat Berjamaah)',
+    isEnabled: true,
+  },
+];
 
 export const DEFAULT_SETTINGS: AppSettings = {
   id: 'setting-default',
@@ -24,6 +90,10 @@ export const DEFAULT_SETTINGS: AppSettings = {
   dutySupervisorName: 'Koordinator Piket Pesantren',
   dutySupervisorNip: '-',
   kopLetterheadEnabled: true,
+  documentCity: 'Bawang',
+  documentDateMode: 'auto',
+  manualDocumentDate: '2026-10-16',
+  recurringTemplate: DEFAULT_RECURRING_TEMPLATE,
 };
 
 export const DEFAULT_ADMIN: UserProfile = {
