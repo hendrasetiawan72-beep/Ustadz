@@ -13,7 +13,7 @@ export type Gender = 'L' | 'P';
 
 export interface Ustadz {
   id: string;
-  employeeNumber: string; // NIP / NIU
+  employeeNumber: string; // NBM (Nomor Baku Muhammadiyah) / NIU
   fullName: string;
   gender?: Gender; // L untuk Ustadz, P untuk Ustadzah
   titlePrefix?: 'Ustadz' | 'Ustadzah';

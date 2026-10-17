@@ -237,7 +237,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* Institution Footer */}
-          <div className="p-3.5 border-t-2 border-slate-900 bg-[#BAE6FD]">
+          <div className="p-3.5 border-t-2 border-slate-900 bg-[#BAE6FD] space-y-2">
             <div className="flex items-center gap-2.5 min-w-0 p-2 bg-white rounded-xl border-1.5 border-slate-900 shadow-[2px_2px_0px_#1e293b]">
               <div className="w-8 h-8 rounded-lg bg-[#FEF08A] border border-slate-900 p-0.5 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
                 <img
@@ -251,6 +251,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <p className="font-display text-xs font-black text-slate-950 truncate">SMK Muhiba</p>
                 <p className="text-[10px] font-bold text-slate-700 truncate">SMK Muhammadiyah Bawang</p>
               </div>
+            </div>
+
+            {/* Developer Credential */}
+            <div className="px-1 flex items-center justify-between text-[10px] font-semibold text-slate-700">
+              <span className="text-[9px] uppercase tracking-wider text-slate-600 font-bold">Portal Absensi</span>
+              <span className="font-mono text-slate-950 font-black">
+                Developed by <span className="bg-white/90 px-1 py-0.2 rounded border border-slate-900/30 text-emerald-950">@hndx07</span>
+              </span>
             </div>
           </div>
         </div>

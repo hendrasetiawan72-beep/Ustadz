@@ -30,7 +30,7 @@ export const DataUstadzView: React.FC<DataUstadzViewProps> = ({
 
   const handleOpenAdd = () => {
     setEditingUstadz(null);
-    setNip(`UST-${new Date().getFullYear()}${String(ustadzList.length + 1).padStart(3, '0')}`);
+    setNip(`NBM-${new Date().getFullYear()}${String(ustadzList.length + 1).padStart(3, '0')}`);
     setFullName('');
     setPhone('');
     setEmail('');
@@ -95,7 +95,7 @@ export const DataUstadzView: React.FC<DataUstadzViewProps> = ({
   const handleExportExcel = () => {
     const data = ustadzList.map((u, idx) => ({
       No: idx + 1,
-      NIP: u.employeeNumber,
+      NBM: u.employeeNumber,
       Nama_Lengkap: u.fullName,
       Bidang_Tugas: u.specialization || '-',
       No_HP_WA: u.phone,
@@ -169,7 +169,7 @@ export const DataUstadzView: React.FC<DataUstadzViewProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari berdasarkan nama, NIP, atau bidang tugas..."
+            placeholder="Cari berdasarkan nama, NBM, atau bidang tugas..."
             className="w-full pl-9 pr-4 py-2 border-2 border-slate-900 rounded-xl text-xs bg-white text-slate-900 font-medium shadow-[1.5px_1.5px_0px_rgba(30,41,59,0.1)] outline-none"
           />
         </div>
@@ -271,7 +271,7 @@ export const DataUstadzView: React.FC<DataUstadzViewProps> = ({
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
                 <label className="block font-bold text-slate-800 mb-1 uppercase text-[10px] tracking-wider">
-                  NIP / Nomor Pegawai
+                  NBM (Nomor Baku Muhammadiyah)
                 </label>
                 <input
                   type="text"

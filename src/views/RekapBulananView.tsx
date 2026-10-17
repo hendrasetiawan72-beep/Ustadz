@@ -130,7 +130,7 @@ export const RekapBulananView: React.FC<RekapBulananViewProps> = ({
     } else {
       const data = ustadzStats.map((item, idx) => ({
         No: idx + 1,
-        NIP: item.ustadz.employeeNumber,
+        NBM: item.ustadz.employeeNumber,
         Nama_Ustadz: item.ustadz.fullName,
         Total_Jadwal: item.totalJadwal,
         Terlaksana: item.terlaksana,
@@ -351,7 +351,7 @@ export const RekapBulananView: React.FC<RekapBulananViewProps> = ({
               <thead className="bg-[#FEF9C3] text-slate-900 border-b-2 border-slate-900 font-bold uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="p-3 w-10 text-center">No</th>
-                  <th className="p-3">NIP</th>
+                  <th className="p-3">NBM</th>
                   <th className="p-3">Nama Ustadz</th>
                   <th className="p-3 text-center">Jumlah Jadwal</th>
                   <th className="p-3 text-center text-emerald-900">Terlaksana</th>

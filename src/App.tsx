@@ -540,6 +540,21 @@ export default function App() {
                 )}
               </Suspense>
             )}
+
+            {/* Global Application Footer */}
+            <footer className="no-print mt-12 pt-6 border-t-2 border-slate-900/15 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+              <div className="flex items-center gap-2 text-center sm:text-left">
+                <span className="font-extrabold text-slate-900">{settings.institutionName || 'Ponpes Baitul Arqom'}</span>
+                <span>&middot;</span>
+                <span>{settings.subTitle || 'SMK Muhammadiyah Bawang'}</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-slate-700 font-semibold">
+                <span>Developed by</span>
+                <span className="font-mono font-black text-slate-950 bg-white px-2.5 py-1 rounded-lg border-1.5 border-slate-900 shadow-[2px_2px_0px_#1e293b]">
+                  @hndx07
+                </span>
+              </div>
+            </footer>
           </div>
         </main>
       </div>

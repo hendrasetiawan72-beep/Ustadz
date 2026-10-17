@@ -45,10 +45,10 @@ export async function downloadExcelTemplate(
   let fileName = '';
 
   if (moduleType === 'ustadz') {
-    headers = ['Nomor_Induk_Pegawai', 'Nama_Lengkap', 'Nomor_HP_WA', 'Email', 'Bidang_Tugas', 'Status_Aktif'];
+    headers = ['Nomor_Baku_Muhammadiyah_NBM', 'Nama_Lengkap', 'Nomor_HP_WA', 'Email', 'Bidang_Tugas', 'Status_Aktif'];
     sampleData = [
       {
-        Nomor_Induk_Pegawai: 'UST-2023008',
+        Nomor_Baku_Muhammadiyah_NBM: 'NBM-2023008',
         Nama_Lengkap: 'Ustadz Lukman Hakim, S.Pd',
         Nomor_HP_WA: '081234567899',
         Email: 'lukman@smkmuhiba.sch.id',
@@ -56,7 +56,7 @@ export async function downloadExcelTemplate(
         Status_Aktif: 'Aktif',
       },
       {
-        Nomor_Induk_Pegawai: 'UST-2023009',
+        Nomor_Baku_Muhammadiyah_NBM: 'NBM-2023009',
         Nama_Lengkap: 'Ustadz Wildan Firdaus, M.Ag',
         Nomor_HP_WA: '081234567898',
         Email: 'wildan@smkmuhiba.sch.id',
@@ -238,11 +238,11 @@ export async function parseAndValidateExcel(
     const errors: string[] = [];
 
     if (moduleType === 'ustadz') {
-      const nip = String(row['Nomor_Induk_Pegawai'] || '').trim();
+      const nip = String(row['Nomor_Baku_Muhammadiyah_NBM'] || row['NBM'] || row['Nomor_Induk_Pegawai'] || row['NIP'] || '').trim();
       const nama = String(row['Nama_Lengkap'] || '').trim();
       const hp = String(row['Nomor_HP_WA'] || '').trim();
 
-      if (!nip) errors.push('Nomor Induk Pegawai (NIP) wajib diisi');
+      if (!nip) errors.push('Nomor Baku Muhammadiyah (NBM) wajib diisi');
       if (!nama) errors.push('Nama Lengkap wajib diisi');
       if (!hp) errors.push('Nomor HP/WA wajib diisi');
 
@@ -282,10 +282,10 @@ export async function parseAndValidateExcel(
         invalidRows.push({ rowNumber, data: row, errors });
       }
     } else if (moduleType === 'piket') {
-      const nip = String(row['Nomor_Induk_Ustadz'] || '').trim();
+      const nip = String(row['NBM_Ustadz'] || row['Nomor_Induk_Ustadz'] || row['NBM'] || row['NIP'] || '').trim();
       const tgl = String(row['Tanggal_Piket'] || '').trim();
 
-      if (!nip) errors.push('Nomor Induk Ustadz wajib diisi');
+      if (!nip) errors.push('Nomor Baku Muhammadiyah (NBM) Ustadz wajib diisi');
       if (!tgl) errors.push('Tanggal Piket wajib diisi');
       else if (!/^\d{4}-\d{2}-\d{2}$/.test(tgl)) {
         errors.push('Format tanggal harus YYYY-MM-DD (contoh: 2026-10-19)');

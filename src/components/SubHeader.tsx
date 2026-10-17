@@ -35,15 +35,15 @@ export const SubHeader: React.FC<SubHeaderProps> = ({
   const titimangsa = formatDocumentDate(settings);
 
   return (
-    <div className="no-print bg-[#FEF08A] border-b-2 border-slate-900 px-3 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2.5 text-xs text-slate-950 shadow-xs shrink-0 z-20">
+    <div className="no-print bg-white border-b-2 border-slate-900 px-3 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2.5 text-xs text-slate-950 shadow-xs shrink-0 z-20">
       {/* Left: Breadcrumbs & Active Page Indicator */}
       <div className="flex items-center gap-2 min-w-0 flex-wrap">
-        <div className="flex items-center gap-1.5 text-amber-950 font-black text-[11px]">
-          <span className="hover:text-amber-800 transition-colors cursor-default">Baitul Arqom</span>
-          <ChevronRight className="w-3.5 h-3.5 text-amber-900/60 shrink-0" />
+        <div className="flex items-center gap-1.5 text-slate-700 font-bold text-[11px]">
+          <span className="hover:text-slate-950 transition-colors cursor-default">Baitul Arqom</span>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
         </div>
 
-        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white border-1.5 border-slate-900 rounded-lg text-slate-950 font-black shadow-[1.5px_1.5px_0px_#1e293b]">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 border-1.5 border-slate-900 rounded-lg text-slate-950 font-black shadow-[1.5px_1.5px_0px_#1e293b]">
           <CurrentIcon className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
           <span className="text-xs truncate">{currentItem?.label || 'Modul Sistem'}</span>
         </div>

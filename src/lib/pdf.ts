@@ -214,7 +214,7 @@ export async function generatePesantrenPDF(options: PDFReportOptions): Promise<j
   const ustadzMap = new Map((data.ustadzList || []).map((u) => [u.id, u]));
 
   if (reportType === 'jadwal_mingguan' || reportType === 'jadwal_bulanan') {
-    tableHeaders = ['No', 'Hari', 'Tanggal', 'Petugas Piket (Ustadz/ah)', 'Sesi Piket', 'NIP', 'Status', 'Catatan'];
+    tableHeaders = ['No', 'Hari', 'Tanggal', 'Petugas Piket (Ustadz/ah)', 'Sesi Piket', 'NBM', 'Status', 'Catatan'];
     const schedules = data.schedules || [];
     tableRows = schedules.map((s, idx) => {
       const u = ustadzMap.get(s.ustadzId);
@@ -244,7 +244,7 @@ export async function generatePesantrenPDF(options: PDFReportOptions): Promise<j
       ];
     });
   } else if (reportType === 'realisasi_piket' || reportType === 'rekap_ustadz_bulanan') {
-    tableHeaders = ['No', 'Nama Ustadz', 'NIP', 'Jml Jadwal', 'Terlaksana', 'Belum/Izin', 'Persentase', 'Kepatuhan'];
+    tableHeaders = ['No', 'Nama Ustadz', 'NBM', 'Jml Jadwal', 'Terlaksana', 'Belum/Izin', 'Persentase', 'Kepatuhan'];
     const ustadzList = data.ustadzList || [];
     const schedules = data.schedules || [];
 
@@ -436,7 +436,7 @@ export async function generatePesantrenPDF(options: PDFReportOptions): Promise<j
   doc.text(titimangsa.fullTitimangsa, sigRightX, signatureY, { align: 'center' });
   doc.text('Pimpinan Pondok Pesantren', sigRightX, signatureY + 4, { align: 'center' });
 
-  // Signature names & NIP (after spacing for ink signature)
+  // Signature names & NBM (after spacing for ink signature)
   doc.setFont('helvetica', 'bold');
   doc.text(settings.dutySupervisorName, sigLeftX, signatureY + 24, { align: 'center' });
   doc.text(settings.leaderName, sigRightX, signatureY + 24, { align: 'center' });
@@ -444,8 +444,8 @@ export async function generatePesantrenPDF(options: PDFReportOptions): Promise<j
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(100, 116, 139);
-  doc.text(`NIP: ${settings.dutySupervisorNip}`, sigLeftX, signatureY + 28, { align: 'center' });
-  doc.text(`NIP: ${settings.leaderNip}`, sigRightX, signatureY + 28, { align: 'center' });
+  doc.text(`NBM: ${settings.dutySupervisorNip}`, sigLeftX, signatureY + 28, { align: 'center' });
+  doc.text(`NBM: ${settings.leaderNip}`, sigRightX, signatureY + 28, { align: 'center' });
 
   return doc;
 }

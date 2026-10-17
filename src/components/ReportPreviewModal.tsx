@@ -81,7 +81,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
         return {
           No: idx + 1,
           Nama_Ustadz: u.fullName,
-          NIP: u.employeeNumber,
+          NBM: u.employeeNumber,
           Total_Jadwal: total,
           Terlaksana: completed,
           Belum_Bertugas: total - completed,
@@ -311,7 +311,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                 <p className="font-semibold mt-1">Koordinator Piket & Kesantrian</p>
                 <div className="h-16"></div>
                 <p className="font-bold underline">{settings.dutySupervisorName}</p>
-                <p className="text-[10px] text-slate-500">NIP: {settings.dutySupervisorNip}</p>
+                <p className="text-[10px] text-slate-500">NBM: {settings.dutySupervisorNip}</p>
               </div>
 
               <div className="text-center">
@@ -321,7 +321,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                 <p className="font-semibold mt-1">Pimpinan Pondok Pesantren</p>
                 <div className="h-16"></div>
                 <p className="font-bold underline">{settings.leaderName}</p>
-                <p className="text-[10px] text-slate-500">NIP: {settings.leaderNip}</p>
+                <p className="text-[10px] text-slate-500">NBM: {settings.leaderNip}</p>
               </div>
             </div>
           </div>

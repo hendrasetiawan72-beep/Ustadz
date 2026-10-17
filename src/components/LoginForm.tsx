@@ -227,8 +227,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
         </div>
 
         {/* Vintage Postmodern Footer stamp */}
-        <div className="text-center mt-4 text-[11px] font-semibold text-slate-500">
-          Ponpes Baitul Arqom &middot; SMK Muhammadiyah Bawang
+        <div className="text-center mt-4 text-[11px] font-semibold text-slate-600 space-y-1">
+          <p>Ponpes Baitul Arqom &middot; SMK Muhammadiyah Bawang</p>
+          <p className="text-[10px] text-slate-500 font-medium">
+            Developed by <span className="font-mono font-black text-slate-900 bg-white/80 px-1.5 py-0.5 rounded border border-slate-900/30">@hndx07</span>
+          </p>
         </div>
       </div>
     </div>

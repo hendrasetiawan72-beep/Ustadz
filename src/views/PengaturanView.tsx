@@ -437,7 +437,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
               />
             </div>
             <div>
-              <label className="block font-bold text-slate-800 mb-1 uppercase text-[10px] tracking-wider">NIP Pimpinan Ponpes</label>
+              <label className="block font-bold text-slate-800 mb-1 uppercase text-[10px] tracking-wider">NBM Pimpinan Ponpes</label>
               <input
                 type="text"
                 value={formSettings.leaderNip}
@@ -456,7 +456,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
               />
             </div>
             <div>
-              <label className="block font-bold text-slate-800 mb-1 uppercase text-[10px] tracking-wider">NIP Koordinator Piket</label>
+              <label className="block font-bold text-slate-800 mb-1 uppercase text-[10px] tracking-wider">NBM Koordinator Piket</label>
               <input
                 type="text"
                 value={formSettings.dutySupervisorNip}
@@ -598,7 +598,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
                 <div className="text-right text-[11px] text-slate-600 border-t sm:border-t-0 sm:border-l border-slate-200 pt-2 sm:pt-0 sm:pl-4">
                   <p className="font-bold text-slate-800">Pimpinan Pondok Pesantren</p>
                   <p className="underline font-bold text-slate-900">{formSettings.leaderName}</p>
-                  <p className="text-[10px] text-slate-500 font-mono">NIP: {formSettings.leaderNip}</p>
+                  <p className="text-[10px] text-slate-500 font-mono">NBM: {formSettings.leaderNip}</p>
                 </div>
               </div>
             </div>
