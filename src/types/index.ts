@@ -1,10 +1,10 @@
-export type UserRole = 'admin';
+export type UserRole = 'admin' | 'ustadz_piket' | 'kepala_pengawas';
 
 export interface UserProfile {
   id: string;
   email: string;
   fullName: string;
-  role: 'admin';
+  role: UserRole;
   isActive: boolean;
   avatarUrl?: string;
 }
@@ -57,7 +57,7 @@ export interface PiketSchedule {
   notes?: string;
   overrideReason?: string; // Reason if multiple duties in the same week
   substituteUstadzId?: string; // If replaced
-  createdBy: string;
+  createdBy?: string;
   createdAt: string;
   updatedAt: string;
 }

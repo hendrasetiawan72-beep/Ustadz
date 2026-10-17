@@ -1,4 +1,3 @@
-import * as XLSX from 'xlsx';
 import { Ustadz, Santri, PiketSchedule, StudentAttendance, AttendanceStatus } from '../types';
 
 export interface ExcelValidationResult<T> {
@@ -11,10 +10,36 @@ export interface ExcelValidationResult<T> {
   totalRows: number;
 }
 
+async function getWorkbookInstance() {
+  const ExcelJS = await import('exceljs');
+  const WorkbookClass = ExcelJS.Workbook || (ExcelJS.default ? ExcelJS.default.Workbook : null);
+  if (!WorkbookClass) {
+    throw new Error('Gagal memuat modul ExcelJS');
+  }
+  return new WorkbookClass();
+}
+
+async function triggerDownload(buffer: ArrayBuffer | Uint8Array, fileName: string) {
+  const blob = new Blob([buffer as BlobPart], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName.endsWith('.xlsx') ? fileName : `${fileName}.xlsx`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 // 1. Download official template
-export function downloadExcelTemplate(
+export async function downloadExcelTemplate(
   moduleType: 'ustadz' | 'santri' | 'piket' | 'absensi' | 'kegiatan'
-): void {
+): Promise<void> {
+  const workbook = await getWorkbookInstance();
+  const worksheet = workbook.addWorksheet('Data');
+
   let headers: string[] = [];
   let sampleData: Record<string, string | number>[] = [];
   let fileName = '';
@@ -27,7 +52,7 @@ export function downloadExcelTemplate(
         Nama_Lengkap: 'Ustadz Lukman Hakim, S.Pd',
         Nomor_HP_WA: '081234567899',
         Email: 'lukman@smkmuhiba.sch.id',
-        Bidang_Tugas: 'Tahfidz Al-Qur\'an',
+        Bidang_Tugas: "Tahfidz Al-Qur'an",
         Status_Aktif: 'Aktif',
       },
       {
@@ -47,7 +72,7 @@ export function downloadExcelTemplate(
         NIS_Santri: 'SAN-2450',
         Nama_Lengkap: 'Muhammad Yusuf Al-Farabi',
         Kelas: 'X - SMK Muhiba',
-        Kelompok: 'Tahfidz Al-Qur\'an',
+        Kelompok: "Tahfidz Al-Qur'an",
         Asrama: 'Asrama Abu Bakar',
         Nama_Wali: 'H. Suryanto',
         No_HP_Wali: '081211223344',
@@ -120,27 +145,90 @@ export function downloadExcelTemplate(
     fileName = 'Template_Catatan_Kegiatan_BaitulArqom.xlsx';
   }
 
-  const ws = XLSX.utils.json_to_sheet(sampleData, { header: headers });
-  // Set column widths
-  const colWidths = headers.map(() => ({ wch: 22 }));
-  ws['!cols'] = colWidths;
+  worksheet.columns = headers.map((h) => ({
+    header: h,
+    key: h,
+    width: 24,
+  }));
 
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Data');
-  XLSX.writeFile(wb, fileName);
+  const headerRow = worksheet.getRow(1);
+  headerRow.font = { bold: true };
+  headerRow.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FFF8FAFC' },
+  };
+
+  sampleData.forEach((row) => worksheet.addRow(row));
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  await triggerDownload(buffer, fileName);
 }
 
-// 2. Parse and Validate Excel file
+// 2. Parse and Validate Excel file (Safe & Efficient)
 export async function parseAndValidateExcel(
   file: File,
   moduleType: 'ustadz' | 'santri' | 'piket' | 'absensi'
 ): Promise<ExcelValidationResult<Record<string, unknown>>> {
-  const data = await file.arrayBuffer();
-  const workbook = XLSX.read(data, { type: 'array' });
-  const firstSheetName = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[firstSheetName];
+  // 1. Validasi Ukuran File (Maksimal 2 MB)
+  if (file.size > 2 * 1024 * 1024) {
+    throw new Error('Ukuran file terlalu besar (maksimal 2 MB). Silakan periksa kembali file Anda.');
+  }
 
-  const rawRows: Record<string, unknown>[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+  // 2. Validasi Tipe MIME / Ekstensi
+  const validExtensions = ['.xlsx', '.xls'];
+  const hasValidExt = validExtensions.some((ext) => file.name.toLowerCase().endsWith(ext));
+  if (!hasValidExt) {
+    throw new Error('Format file tidak didukung. Harap unggah file spreadsheet Excel (.xlsx).');
+  }
+
+  const workbook = await getWorkbookInstance();
+  const data = await file.arrayBuffer();
+  await workbook.xlsx.load(data);
+
+  const worksheet = workbook.worksheets[0];
+  if (!worksheet) {
+    throw new Error('Lembar kerja Excel kosong atau tidak ditemukan.');
+  }
+
+  // Baca Header dari Baris 1
+  const headers: string[] = [];
+  const headerRow = worksheet.getRow(1);
+  headerRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+    headers[colNumber] = String(cell.value || '').trim();
+  });
+
+  const rawRows: Record<string, unknown>[] = [];
+  worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+    if (rowNumber === 1) return; // Lewati header
+    const rowObj: Record<string, unknown> = {};
+    let hasContent = false;
+
+    row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+      const colName = headers[colNumber];
+      if (colName) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let val: any = cell.value;
+        if (val && typeof val === 'object') {
+          if ('result' in val) val = val.result;
+          else if ('text' in val) val = val.text;
+        }
+        if (val !== undefined && val !== null && String(val).trim() !== '') {
+          hasContent = true;
+        }
+        rowObj[colName] = val ?? '';
+      }
+    });
+
+    if (hasContent) {
+      rawRows.push(rowObj);
+    }
+  });
+
+  // 3. Batasi Jumlah Baris (Maksimal 2.000 baris)
+  if (rawRows.length > 2000) {
+    throw new Error(`File memuat ${rawRows.length} baris, melebihi batas maksimal 2.000 baris.`);
+  }
 
   const validRows: Record<string, unknown>[] = [];
   const invalidRows: Array<{ rowNumber: number; data: Record<string, unknown>; errors: string[] }> = [];
@@ -246,29 +334,71 @@ export async function parseAndValidateExcel(
 }
 
 // 3. Export Error Report
-export function downloadErrorReport(
+export async function downloadErrorReport(
   invalidRows: Array<{ rowNumber: number; data: Record<string, unknown>; errors: string[] }>
-): void {
+): Promise<void> {
+  const workbook = await getWorkbookInstance();
+  const worksheet = workbook.addWorksheet('Error_Report');
+
   const exportData = invalidRows.map((r) => ({
     Baris_Ke: r.rowNumber,
     Pesan_Kesalahan: r.errors.join('; '),
     ...r.data,
   }));
 
-  const ws = XLSX.utils.json_to_sheet(exportData);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Error_Report');
-  XLSX.writeFile(wb, `Laporan_Kesalahan_Impor_${new Date().toISOString().split('T')[0]}.xlsx`);
+  if (exportData.length > 0) {
+    const keys = Object.keys(exportData[0]);
+    worksheet.columns = keys.map((k) => ({
+      header: k,
+      key: k,
+      width: Math.max(k.length + 4, 18),
+    }));
+
+    const headerRow = worksheet.getRow(1);
+    headerRow.font = { bold: true };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFFFE4E6' },
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    exportData.forEach((row) => worksheet.addRow(row as any));
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  await triggerDownload(buffer, `Laporan_Kesalahan_Impor_${new Date().toISOString().split('T')[0]}.xlsx`);
 }
 
 // 4. Export generic data to Excel
-export function exportDataToExcel(
+export async function exportDataToExcel(
   data: Record<string, unknown>[],
   fileName: string,
   sheetName: string = 'Sheet1'
-): void {
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, sheetName);
-  XLSX.writeFile(wb, fileName.endsWith('.xlsx') ? fileName : `${fileName}.xlsx`);
+): Promise<void> {
+  const workbook = await getWorkbookInstance();
+  const worksheet = workbook.addWorksheet(sheetName);
+
+  if (data.length > 0) {
+    const keys = Object.keys(data[0]);
+    worksheet.columns = keys.map((key) => ({
+      header: key,
+      key: key,
+      width: Math.max(key.length + 4, 16),
+    }));
+
+    const headerRow = worksheet.getRow(1);
+    headerRow.font = { bold: true };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFF1F5F9' },
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data.forEach((item) => worksheet.addRow(item as any));
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  await triggerDownload(buffer, fileName);
 }

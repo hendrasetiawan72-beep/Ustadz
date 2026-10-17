@@ -22,7 +22,7 @@ import { AppSettings, UserRole, Ustadz, RecurringScheduleItem } from '../types';
 import { updateAppSettings, resetToInitialData, generateRecurringPiketSchedules } from '../lib/db';
 import {
   getSupabaseCredentials,
-  saveSupabaseCredentials,
+  isSupabaseConfigured,
   testSupabaseConnection,
 } from '../lib/supabase';
 import { OFFICIAL_LOGO_URL, DEFAULT_RECURRING_TEMPLATE, INITIAL_USTADZ } from '../lib/constants';
@@ -54,13 +54,11 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
 
   const ustadzOptions = ustadzList.length > 0 ? ustadzList : INITIAL_USTADZ;
 
-  // Supabase connection config
+  // Supabase connection config from environment variables
   const creds = getSupabaseCredentials();
-  const [supabaseUrl, setSupabaseUrl] = useState(creds.url);
-  const [supabaseAnonKey, setSupabaseAnonKey] = useState(creds.anonKey);
+  const isCloudConfigured = isSupabaseConfigured();
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [isTesting, setIsTesting] = useState(false);
-  const [copiedSql, setCopiedSql] = useState(false);
 
   const previewTitimangsa = () => {
     const city = (formSettings.documentCity || 'Bawang').trim();
@@ -173,22 +171,16 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
     setIsTesting(true);
     setTestResult(null);
     try {
-      const res = await testSupabaseConnection(supabaseUrl, supabaseAnonKey);
+      const res = await testSupabaseConnection();
       setTestResult(res);
     } catch {
       setTestResult({
         success: false,
-        message: 'Koneksi gagal. Pastikan URL dan Anon Key sudah benar.',
+        message: 'Koneksi gagal. Periksa kembali env VITE_SUPABASE_URL dan VITE_SUPABASE_ANON_KEY.',
       });
     } finally {
       setIsTesting(false);
     }
-  };
-
-  const handleSaveSupabaseConfig = () => {
-    saveSupabaseCredentials(supabaseUrl, supabaseAnonKey);
-    alert('Kredensial Supabase disimpan. Silakan muat ulang halaman untuk sinkronisasi.');
-    window.location.reload();
   };
 
   const handleResetDemoData = () => {
@@ -757,45 +749,47 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
         </div>
       </form>
 
-      {/* Section 6: Supabase Cloud Database Manager */}
+      {/* Section 6: Supabase Cloud Database Status (Env-Only) */}
       <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
         <div className="flex items-center justify-between border-b-2 border-slate-900/10 pb-2">
           <div className="flex items-center gap-2">
             <Database className="w-4 h-4 text-emerald-700" />
             <h3 className="font-display font-black text-slate-950 text-sm">
-              6. Integrasi Backend Cloud Supabase
+              6. Status Integrasi Cloud Supabase (Environment Variables)
             </h3>
           </div>
-          <span className="neo-badge px-2.5 py-0.5 text-[10px] font-black bg-[#E0F2FE] text-sky-950">
-            PostgreSQL &amp; RLS
+          <span
+            className={`neo-badge px-2.5 py-0.5 text-[10px] font-black ${
+              isCloudConfigured
+                ? 'bg-[#DCFCE7] text-emerald-950'
+                : 'bg-[#FEF08A] text-amber-950'
+            }`}
+          >
+            {isCloudConfigured ? 'Cloud Supabase Terhubung' : 'MODE DEMO AKTIF'}
           </span>
         </div>
 
         <p className="text-slate-600 leading-relaxed font-medium">
-          Aplikasi mendukung koneksi langsung ke project Supabase Anda. Seluruh skema database PostgreSQL, Row Level Security (RLS), tabel ustadz, santri, piket, dan absensi sudah tersedia di file <code>/supabase_schema.sql</code>.
+          Demi keamanan data privasi santri dan ustadz, kredensial Supabase dikonfigurasi secara ketat melalui variabel lingkungan (<code>VITE_SUPABASE_URL</code> dan <code>VITE_SUPABASE_ANON_KEY</code>) serta tidak pernah disimpan di localStorage browser. Kunci hak akses tingkat tinggi (<em>service_role</em>) tidak pernah digunakan di frontend.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block font-bold text-slate-800 mb-1 uppercase text-[10px] tracking-wider">Supabase Project URL</label>
-            <input
-              type="text"
-              value={supabaseUrl}
-              onChange={(e) => setSupabaseUrl(e.target.value)}
-              placeholder="https://your-project.supabase.co"
-              className="w-full border-2 border-slate-900 rounded-xl px-3 py-2 font-mono font-medium bg-white"
-            />
+          <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+            <span className="font-bold text-slate-600 text-[10px] uppercase tracking-wider block">
+              VITE_SUPABASE_URL (Environment)
+            </span>
+            <span className="font-mono font-bold text-slate-900 text-xs truncate block">
+              {creds.url ? `${creds.url.slice(0, 24)}...` : '(Belum diatur di environment)'}
+            </span>
           </div>
 
-          <div>
-            <label className="block font-bold text-slate-800 mb-1 uppercase text-[10px] tracking-wider">Supabase Anon Key (Public)</label>
-            <input
-              type="password"
-              value={supabaseAnonKey}
-              onChange={(e) => setSupabaseAnonKey(e.target.value)}
-              placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-              className="w-full border-2 border-slate-900 rounded-xl px-3 py-2 font-mono font-medium bg-white"
-            />
+          <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+            <span className="font-bold text-slate-600 text-[10px] uppercase tracking-wider block">
+              VITE_SUPABASE_ANON_KEY (Public Key)
+            </span>
+            <span className="font-mono font-bold text-slate-900 text-xs truncate block">
+              {creds.anonKey ? `${creds.anonKey.slice(0, 16)}...` : '(Belum diatur di environment)'}
+            </span>
           </div>
         </div>
 
@@ -817,32 +811,26 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
         )}
 
         <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleTestSupabase}
-              disabled={isTesting}
-              className="neo-btn px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-900 font-bold rounded-xl cursor-pointer"
-            >
-              {isTesting ? 'Menguji...' : 'Uji Koneksi Supabase'}
-            </button>
-            <button
-              type="button"
-              onClick={handleSaveSupabaseConfig}
-              className="neo-btn px-3.5 py-2 bg-[#BBF7D0] hover:bg-[#86EFAC] text-emerald-950 font-black rounded-xl cursor-pointer"
-            >
-              Simpan Kredensial Supabase
-            </button>
-          </div>
-
           <button
             type="button"
-            onClick={handleResetDemoData}
-            className="neo-btn px-3.5 py-2 text-rose-950 bg-[#FFE4E6] hover:bg-[#FECDD3] font-bold rounded-xl flex items-center gap-1.5 cursor-pointer"
+            onClick={handleTestSupabase}
+            disabled={isTesting}
+            className="neo-btn px-4 py-2 bg-white hover:bg-slate-100 text-slate-900 font-bold rounded-xl cursor-pointer flex items-center gap-2"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-rose-800" />
-            <span>Reset Data Demo Awal</span>
+            <Database className="w-3.5 h-3.5 text-slate-700" />
+            <span>{isTesting ? 'Menguji Koneksi...' : 'Uji Koneksi Supabase Cloud'}</span>
           </button>
+
+          {!isCloudConfigured && (
+            <button
+              type="button"
+              onClick={handleResetDemoData}
+              className="neo-btn px-3.5 py-2 text-rose-950 bg-[#FFE4E6] hover:bg-[#FECDD3] font-bold rounded-xl flex items-center gap-1.5 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-rose-800" />
+              <span>Reset Data Demo Awal</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -1,5 +1,4 @@
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import type jsPDF from 'jspdf';
 import { AppSettings, ReportType, Ustadz, Santri, PiketSchedule, ActivitySession, StudentAttendance } from '../types';
 import { OFFICIAL_LOGO_URL } from './constants';
 
@@ -106,13 +105,18 @@ export async function getBase64ImageFromUrl(imageUrl: string): Promise<string | 
 export async function generatePesantrenPDF(options: PDFReportOptions): Promise<jsPDF> {
   const { reportType, title, periodText, settings, data } = options;
 
+  const { default: jsPDFClass } = await import('jspdf');
+  const autoTableModule = await import('jspdf-autotable');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const autoTable = (autoTableModule.default || autoTableModule) as any;
+
   // Decide orientation: Landscape for wide tables (Rekap santri, Laporan lengkap), Portrait for others
   const isLandscape =
     reportType === 'rekap_santri_bulanan' ||
     reportType === 'laporan_lengkap_bulanan' ||
     reportType === 'realisasi_piket';
 
-  const doc = new jsPDF({
+  const doc = new jsPDFClass({
     orientation: isLandscape ? 'landscape' : 'portrait',
     unit: 'mm',
     format: 'a4',
@@ -383,7 +387,8 @@ export async function generatePesantrenPDF(options: PDFReportOptions): Promise<j
       halign: 'center',
     },
     margin: { left: marginLeft, right: marginRight, top: marginTop, bottom: marginBottom + 30 },
-    didDrawPage: (dataHook) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    didDrawPage: (dataHook: any) => {
       // Add page numbers
       const pageCount = doc.internal.pages.length - 1;
       doc.setFont('helvetica', 'normal');

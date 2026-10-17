@@ -18,14 +18,8 @@ import {
   ExcelValidationResult,
 } from '../lib/excel';
 import {
-  addUstadz,
-  updateUstadz,
-  addSantri,
-  updateSantri,
-  addPiketSchedule,
-  getUstadzList,
-  getSantriList,
-  getPiketSchedules,
+  batchUpsertUstadz,
+  batchUpsertSantri,
 } from '../lib/db';
 import { Ustadz, Santri, UserRole } from '../types';
 
@@ -84,86 +78,50 @@ export const ImporExcelView: React.FC<ImporExcelViewProps> = ({
     if (!validationResult || validationResult.validRows.length === 0) return;
 
     setIsProcessing(true);
-    let successCount = 0;
-    let skippedCount = 0;
-    let failedCount = 0;
 
     try {
       if (selectedModule === 'ustadz') {
-        const existingUstadz = await getUstadzList();
-        for (const row of validationResult.validRows) {
-          const nip = String(row.employeeNumber);
-          const match = existingUstadz.find((u) => u.employeeNumber === nip);
+        const ustadzRows: Omit<Ustadz, 'id' | 'createdAt'>[] = validationResult.validRows.map((row) => ({
+          employeeNumber: String(row.employeeNumber || '').trim(),
+          fullName: String(row.fullName || '').trim(),
+          phone: String(row.phone || '-').trim(),
+          email: String(row.email || '').trim(),
+          specialization: String(row.specialization || 'Pengajar & Piket').trim(),
+          isActive: row.isActive !== false,
+        }));
 
-          if (match) {
-            if (duplicateStrategy === 'skip') {
-              skippedCount++;
-            } else {
-              await updateUstadz(match.id, {
-                fullName: String(row.fullName),
-                specialization: String(row.specialization || match.specialization),
-                phone: String(row.phone || match.phone),
-                email: String(row.email || match.email),
-              });
-              successCount++;
-            }
-          } else {
-            await addUstadz({
-              employeeNumber: nip,
-              fullName: String(row.fullName),
-              specialization: String(row.specialization || 'Umum'),
-              phone: String(row.phone || '-'),
-              email: String(row.email || ''),
-              isActive: true,
-            });
-            successCount++;
-          }
-        }
+        const res = await batchUpsertUstadz(ustadzRows, 'Pengelola Impor Data');
+
+        setImportSummary({
+          success: res.count,
+          skipped: 0,
+          failed: validationResult.invalidRows.length,
+        });
       } else if (selectedModule === 'santri') {
-        const existingSantri = await getSantriList();
-        for (const row of validationResult.validRows) {
-          const nis = String(row.studentNumber);
-          const match = existingSantri.find((s) => s.studentNumber === nis);
+        const santriRows: Omit<Santri, 'id' | 'createdAt'>[] = validationResult.validRows.map((row) => ({
+          studentNumber: String(row.studentNumber || '').trim(),
+          fullName: String(row.fullName || '').trim(),
+          className: (String(row.className || 'X - SMK Muhiba').trim()) as Santri['className'],
+          groupName: (String(row.groupName || 'Reguler').trim()) as Santri['groupName'],
+          dormitory: (String(row.dormitory || 'Asrama Abu Bakar').trim()) as Santri['dormitory'],
+          guardianName: String(row.guardianName || '-').trim(),
+          guardianPhone: String(row.guardianPhone || '-').trim(),
+          isActive: row.isActive !== false,
+        }));
 
-          if (match) {
-            if (duplicateStrategy === 'skip') {
-              skippedCount++;
-            } else {
-              await updateSantri(match.id, {
-                fullName: String(row.fullName),
-                className: String(row.className || match.className),
-                dormitory: String(row.dormitory || match.dormitory),
-                guardianName: String(row.guardianName || match.guardianName),
-                guardianPhone: String(row.guardianPhone || match.guardianPhone),
-              });
-              successCount++;
-            }
-          } else {
-            await addSantri({
-              studentNumber: nis,
-              fullName: String(row.fullName),
-              className: String(row.className || 'X - SMK Muhiba'),
-              groupName: 'Reguler',
-              dormitory: String(row.dormitory || 'Asrama Abu Bakar'),
-              guardianName: String(row.guardianName || '-'),
-              guardianPhone: String(row.guardianPhone || '-'),
-              isActive: true,
-            });
-            successCount++;
-          }
-        }
+        const res = await batchUpsertSantri(santriRows, 'Pengelola Impor Data');
+
+        setImportSummary({
+          success: res.count,
+          skipped: 0,
+          failed: validationResult.invalidRows.length,
+        });
       }
-
-      setImportSummary({
-        success: successCount,
-        skipped: skippedCount,
-        failed: failedCount + validationResult.invalidRows.length,
-      });
 
       onRefresh();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      alert(`Terjadi kesalahan saat menyimpan data: ${msg}`);
+      alert(`Gagal menyimpan data impor batch: ${msg}`);
     } finally {
       setIsProcessing(false);
     }

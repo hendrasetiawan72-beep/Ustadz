@@ -82,23 +82,31 @@ export const Header: React.FC<HeaderProps> = ({
 
         <div className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 bg-[#FEF3C7] border border-slate-900/30 rounded-full font-medium text-amber-950">
           <Database className="w-3 h-3 text-amber-700" />
-          <span>DB:</span>
-          <span className={`font-bold ${isSupabaseLive ? 'text-emerald-700' : 'text-amber-800'}`}>
-            {isSupabaseLive ? 'Supabase' : 'Lokal/Sync'}
-          </span>
+          <span>Status:</span>
+          {isSupabaseLive ? (
+            <span className="font-bold text-emerald-800">Supabase Cloud</span>
+          ) : (
+            <span className="font-black px-1.5 py-0.5 bg-[#FEF08A] text-amber-950 border border-slate-900 rounded text-[9px]">
+              MODE DEMO
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Zone 3: Single Role (Admin) & Logout Action */}
+      {/* Zone 3: Role & Logout Action */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <div className="flex items-center gap-2 bg-[#DCFCE7] border-1.5 border-slate-900 px-2.5 sm:px-3 py-1.5 rounded-xl shadow-[2px_2px_0px_#1e293b]">
           <ShieldCheck className="w-4 h-4 text-emerald-900 shrink-0" />
           <div className="text-left hidden sm:block min-w-0">
             <span className="text-[11px] font-black text-emerald-950 block leading-none">
-              Admin Pesantren
+              {currentUser.role === 'ustadz_piket'
+                ? 'Ustadz Piket'
+                : currentUser.role === 'kepala_pengawas'
+                ? 'Kepala Pengawas'
+                : 'Admin Pesantren'}
             </span>
-            <span className="text-[10px] text-emerald-800 font-bold block truncate max-w-[125px]">
-              {currentUser.email}
+            <span className="text-[10px] text-emerald-800 font-bold block truncate max-w-[135px]">
+              {currentUser.fullName || currentUser.email}
             </span>
           </div>
         </div>

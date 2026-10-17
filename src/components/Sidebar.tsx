@@ -16,6 +16,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { OFFICIAL_LOGO_URL } from '../lib/constants';
+import { UserRole } from '../types';
 
 export type NavigationTab =
   | 'dashboard'
@@ -36,6 +37,7 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onToggleCollapse?: () => void;
+  userRole?: UserRole;
 }
 
 interface MenuItem {
@@ -118,7 +120,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onClose,
   onToggleCollapse,
+  userRole = 'admin',
 }) => {
+  // Saring menu sesuai role pengguna
+  const visibleMenuItems = MENU_ITEMS.filter((item) => {
+    if (userRole === 'admin') return true;
+
+    if (userRole === 'ustadz_piket') {
+      // ustadz_piket hanya melihat Kegiatan Malam, Kegiatan Pagi, dan Jadwal Piket
+      return ['kegiatan_malam', 'kegiatan_pagi', 'jadwal_piket'].includes(item.id);
+    }
+
+    if (userRole === 'kepala_pengawas') {
+      // kepala_pengawas hanya bisa melihat dan mencetak
+      return [
+        'dashboard',
+        'jadwal_piket',
+        'kegiatan_malam',
+        'kegiatan_pagi',
+        'rekap_bulanan',
+        'data_ustadz',
+        'data_santri',
+        'cetak_ekspor',
+      ].includes(item.id);
+    }
+
+    return true;
+  });
+
+  const roleLabel =
+    userRole === 'ustadz_piket'
+      ? 'Akses Ustadz Piket'
+      : userRole === 'kepala_pengawas'
+      ? 'Akses Pengawas'
+      : 'Navigasi Admin';
+
   return (
     <>
       {/* Mobile Backdrop */}
@@ -129,7 +165,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      {/* Sidebar Container: can be hidden on desktop as well as mobile! */}
+      {/* Sidebar Container */}
       <aside
         className={`no-print fixed md:static inset-y-0 left-0 z-40 bg-[#FAF7F2] border-r-2 border-slate-900 flex flex-col justify-between transition-all duration-300 ease-in-out shrink-0 ${
           isOpen
@@ -143,7 +179,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 border border-slate-900" />
               <span className="font-display font-black text-slate-900 text-xs uppercase tracking-wider">
-                Navigasi Admin
+                {roleLabel}
               </span>
             </div>
             <button
@@ -159,9 +195,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Navigation Links List */}
           <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1.5">
             <div className="px-3 pb-1.5 text-[10px] font-black tracking-wider text-slate-400 uppercase">
-              Menu Utama & Piket
+              Menu Terotorisasi
             </div>
-            {MENU_ITEMS.map((item) => {
+            {visibleMenuItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentTab === item.id;
 

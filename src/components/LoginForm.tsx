@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Lock, Mail, Eye, EyeOff, LogIn, AlertCircle, ShieldCheck } from 'lucide-react';
 import { UserProfile, AppSettings } from '../types';
 import { DEFAULT_ADMIN, OFFICIAL_LOGO_URL } from '../lib/constants';
-import { getSupabaseClient } from '../lib/supabase';
+import { getSupabaseClient, isSupabaseConfigured } from '../lib/supabase';
 
 interface LoginFormProps {
   settings: AppSettings;
@@ -28,67 +28,79 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
     setIsLoading(true);
 
     const supabase = getSupabaseClient();
-    if (supabase) {
+    if (supabase && isSupabaseConfigured()) {
       try {
         const { data, error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
           password: password.trim(),
         });
 
-        if (error) {
-          setErrorMessage(error.message || 'Login gagal. Periksa kembali email dan kata sandi Anda.');
+        if (error || !data.user) {
+          setErrorMessage(error?.message || 'Login gagal. Periksa kembali email dan kata sandi Anda.');
           setIsLoading(false);
           return;
         }
 
-        let role: UserProfile['role'] = 'admin';
-        let fullName = 'Administrator Pesantren';
+        // Ambil profil secara ketat dari tabel profiles
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, email, full_name, role, is_active')
+          .eq('id', data.user.id)
+          .maybeSingle();
 
-        if (data.user) {
-          try {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('role, full_name')
-              .eq('id', data.user.id)
-              .single();
+        if (profileError || !profile) {
+          await supabase.auth.signOut();
+          setErrorMessage(
+            'Profil akun Anda belum terdaftar di tabel profiles. Hubungi administrator untuk membuat profil pengguna.'
+          );
+          setIsLoading(false);
+          return;
+        }
 
-            if (profile) {
-              role = (profile.role as UserProfile['role']) || 'admin';
-              fullName = profile.full_name || fullName;
-            }
-          } catch {
-            // fallback
-          }
+        if (profile.is_active === false) {
+          await supabase.auth.signOut();
+          setErrorMessage('Akses ditolak: Akun Anda sedang dinonaktifkan oleh administrator.');
+          setIsLoading(false);
+          return;
+        }
+
+        const validRoles = ['admin', 'ustadz_piket', 'kepala_pengawas'];
+        if (!validRoles.includes(profile.role)) {
+          await supabase.auth.signOut();
+          setErrorMessage(`Role akun "${profile.role}" tidak diizinkan mengakses sistem.`);
+          setIsLoading(false);
+          return;
         }
 
         const authenticatedUser: UserProfile = {
-          id: data.user?.id || 'user-admin',
-          email: data.user?.email || email.trim(),
-          fullName,
-          role,
+          id: data.user.id,
+          email: profile.email || data.user.email || email.trim(),
+          fullName: profile.full_name || 'Pengguna Pesantren',
+          role: profile.role,
           isActive: true,
         };
-        localStorage.setItem('ponpes_auth_user', JSON.stringify(authenticatedUser));
+
+        // Saat Supabase aktif, jangan simpan akun ke localStorage
         onLoginSuccess(authenticatedUser);
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
-        setErrorMessage(`Terjadi kesalahan: ${msg}`);
+        setErrorMessage(`Terjadi kesalahan login: ${msg}`);
       } finally {
         setIsLoading(false);
       }
       return;
     }
 
-    // Fallback mode jika Supabase belum dikonfigurasi
+    // Mode Demo: hanya aktif jika Supabase belum dikonfigurasi
     setTimeout(() => {
-      const adminUser: UserProfile = {
+      const demoUser: UserProfile = {
         ...DEFAULT_ADMIN,
         email: email.trim(),
-        fullName: 'Administrator Pesantren',
+        fullName: 'Administrator Demo',
         role: 'admin',
       };
-      localStorage.setItem('ponpes_auth_user', JSON.stringify(adminUser));
-      onLoginSuccess(adminUser);
+      localStorage.setItem('ponpes_auth_user', JSON.stringify(demoUser));
+      onLoginSuccess(demoUser);
       setIsLoading(false);
     }, 350);
   };
