@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Lock, Mail, Eye, EyeOff, LogIn, AlertCircle, Sparkles, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, LogIn, AlertCircle, ShieldCheck } from 'lucide-react';
 import { UserProfile, AppSettings } from '../types';
 import { DEFAULT_ADMIN, OFFICIAL_LOGO_URL } from '../lib/constants';
+import { getSupabaseClient } from '../lib/supabase';
 
 interface LoginFormProps {
   settings: AppSettings;
@@ -9,39 +10,87 @@ interface LoginFormProps {
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }) => {
-  const [email, setEmail] = useState('admin@muhiba.sch.id');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+
+    if (!email.trim() || !password.trim()) {
+      setErrorMessage('Silakan isi email dan kata sandi terlebih dahulu.');
+      return;
+    }
+
     setIsLoading(true);
 
-    setTimeout(() => {
-      // Peran hanya satu yaitu admin
-      if (email.trim() && password.trim()) {
-        const adminUser: UserProfile = {
-          ...DEFAULT_ADMIN,
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
-          fullName: 'Administrator Pesantren',
-          role: 'admin',
+          password: password.trim(),
+        });
+
+        if (error) {
+          setErrorMessage(error.message || 'Login gagal. Periksa kembali email dan kata sandi Anda.');
+          setIsLoading(false);
+          return;
+        }
+
+        let role: UserProfile['role'] = 'admin';
+        let fullName = 'Administrator Pesantren';
+
+        if (data.user) {
+          try {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('role, full_name')
+              .eq('id', data.user.id)
+              .single();
+
+            if (profile) {
+              role = (profile.role as UserProfile['role']) || 'admin';
+              fullName = profile.full_name || fullName;
+            }
+          } catch {
+            // fallback
+          }
+        }
+
+        const authenticatedUser: UserProfile = {
+          id: data.user?.id || 'user-admin',
+          email: data.user?.email || email.trim(),
+          fullName,
+          role,
+          isActive: true,
         };
-        localStorage.setItem('ponpes_auth_user', JSON.stringify(adminUser));
-        onLoginSuccess(adminUser);
-      } else {
-        setErrorMessage('Silakan isi email dan password dengan benar.');
+        localStorage.setItem('ponpes_auth_user', JSON.stringify(authenticatedUser));
+        onLoginSuccess(authenticatedUser);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        setErrorMessage(`Terjadi kesalahan: ${msg}`);
+      } finally {
+        setIsLoading(false);
       }
+      return;
+    }
+
+    // Fallback mode jika Supabase belum dikonfigurasi
+    setTimeout(() => {
+      const adminUser: UserProfile = {
+        ...DEFAULT_ADMIN,
+        email: email.trim(),
+        fullName: 'Administrator Pesantren',
+        role: 'admin',
+      };
+      localStorage.setItem('ponpes_auth_user', JSON.stringify(adminUser));
+      onLoginSuccess(adminUser);
       setIsLoading(false);
     }, 350);
-  };
-
-  const handleQuickFill = (targetEmail: string) => {
-    setEmail(targetEmail);
-    setPassword('admin123');
-    setErrorMessage('');
   };
 
   return (
@@ -89,7 +138,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
               {settings.subTitle || 'SMK MUHAMMADIYAH BAWANG'}
             </h2>
             <p className="text-xs text-slate-600 mt-1.5 max-w-xs mx-auto">
-              Kegiatan Malam (Maghrib - Isya) & Kegiatan Pagi (Subuh - 06.00)
+              Kegiatan Malam (Maghrib - Isya) &amp; Kegiatan Pagi (Subuh - 06.00)
             </p>
           </div>
 
@@ -106,7 +155,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
               {/* Email Field */}
               <div>
                 <label className="block font-bold text-slate-800 mb-1.5 uppercase text-[11px] tracking-wider">
-                  Alamat Email Admin
+                  Alamat Email
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -114,7 +163,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@muhiba.sch.id"
+                    placeholder="nama@email.sch.id"
                     className="w-full pl-10 pr-3.5 py-2.5 border-2 border-slate-900 rounded-xl bg-white focus:outline-none focus:bg-[#FFFDF0] text-slate-900 text-xs font-medium shadow-[2px_2px_0px_rgba(30,41,59,0.1)] focus:shadow-[2px_2px_0px_#1e293b] transition-all"
                     required
                   />
@@ -162,20 +211,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
                 )}
               </button>
             </form>
-
-            {/* Quick Demo Helper */}
-            <div className="mt-6 pt-5 border-t-2 border-dashed border-slate-200 text-center">
-              <span className="text-[11px] font-bold text-slate-500 block mb-2">
-                Akses Cepat Pengurus:
-              </span>
-              <button
-                type="button"
-                onClick={() => handleQuickFill('admin@muhiba.sch.id')}
-                className="px-3.5 py-1.5 bg-[#FEF3C7] hover:bg-[#FDE68A] text-slate-900 font-bold rounded-lg text-[11px] transition-all border border-slate-900 shadow-[1.5px_1.5px_0px_#1e293b]"
-              >
-                admin@muhiba.sch.id &middot; Sandi: admin123
-              </button>
-            </div>
           </div>
         </div>
 
