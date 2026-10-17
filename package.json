@@ -32,5 +32,6 @@
     "esbuild": "^0.25.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2"
+    "exceljs": "^4.4.0"
   }
 }
