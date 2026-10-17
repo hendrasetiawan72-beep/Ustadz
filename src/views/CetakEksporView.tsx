@@ -213,7 +213,7 @@ export const CetakEksporView: React.FC<CetakEksporViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Header: Postmodern Neobrutalist Rounded Canvas */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="neo-badge px-3 py-0.5 text-[10px] font-black bg-[#BBF7D0] text-emerald-950 uppercase tracking-wider inline-flex items-center gap-1">
@@ -235,7 +235,7 @@ export const CetakEksporView: React.FC<CetakEksporViewProps> = ({
         const titimangsa = formatDocumentDate(settings);
         const isManual = settings.documentDateMode === 'manual';
         return (
-          <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-4 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="bg-white border-2 border-slate-900 rounded-2xl p-4 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="flex items-start sm:items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-[#FEF08A] border border-slate-900 flex items-center justify-center shrink-0 text-amber-950 shadow-[1.5px_1.5px_0px_#1e293b]">
                 <MapPin className="w-4 h-4 text-amber-800" />
@@ -270,7 +270,7 @@ export const CetakEksporView: React.FC<CetakEksporViewProps> = ({
       })()}
 
       {/* Filter and Period Selection Box */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-4 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs">
+      <div className="bg-white border-2 border-slate-900 rounded-2xl p-4 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs">
         {/* Category Tabs */}
         <div className="flex flex-wrap items-center p-1 bg-[#FAF7F2] rounded-xl border border-slate-900/20">
           <button
@@ -353,7 +353,7 @@ export const CetakEksporView: React.FC<CetakEksporViewProps> = ({
         {filteredCatalog.map((item) => (
           <div
             key={item.id}
-            className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-5 shadow-[3.5px_3.5px_0px_#1e293b] hover:shadow-[5px_5px_0px_#1e293b] transition-all flex flex-col justify-between"
+            className="bg-white border-2 border-slate-900 rounded-2xl p-5 shadow-[3.5px_3.5px_0px_#1e293b] hover:shadow-[5px_5px_0px_#1e293b] transition-all flex flex-col justify-between"
           >
             <div>
               <div className="flex items-start justify-between gap-2 mb-2">

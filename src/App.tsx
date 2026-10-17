@@ -29,6 +29,7 @@ import {
 import { getSupabaseClient, isSupabaseConfigured } from './lib/supabase';
 import { LoginForm } from './components/LoginForm';
 import { Header } from './components/Header';
+import { SubHeader } from './components/SubHeader';
 import { Sidebar, NavigationTab } from './components/Sidebar';
 import { ReportPreviewModal } from './components/ReportPreviewModal';
 import { AlertCircle, RefreshCw } from 'lucide-react';
@@ -324,6 +325,14 @@ export default function App() {
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         isSidebarOpen={sidebarOpen}
         settings={settings}
+        isSupabaseLive={isSupabaseLive}
+      />
+
+      {/* Sub Header Bar */}
+      <SubHeader
+        currentTab={currentTab}
+        settings={settings}
+        userRole={role}
         isSupabaseLive={isSupabaseLive}
       />
 

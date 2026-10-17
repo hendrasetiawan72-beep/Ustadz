@@ -14,7 +14,7 @@ import {
   Calendar,
   Clock,
   Repeat,
-  Sparkles,
+  Zap,
   CalendarDays,
   FileCheck,
 } from 'lucide-react';
@@ -198,7 +198,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Header: Postmodern Neobrutalist Rounded Canvas */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="neo-badge px-3 py-0.5 text-[10px] font-black bg-[#FEF08A] text-amber-950 uppercase tracking-wider inline-flex items-center gap-1">
@@ -225,7 +225,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
       {/* Settings Form */}
       <form onSubmit={handleSaveSettings} className="space-y-6">
         {/* Section 1: Identitas Lembaga & Logo */}
-        <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
+        <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
           <h3 className="font-display font-black text-slate-950 text-sm border-b-2 border-slate-900/10 pb-2">
             1. Identitas Resmi Lembaga &amp; Kop Surat
           </h3>
@@ -340,7 +340,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
         </div>
 
         {/* Section 2: Jadwal Operasional & Sesi */}
-        <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
+        <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
           <h3 className="font-display font-black text-slate-950 text-sm border-b-2 border-slate-900/10 pb-2">
             2. Jam Operasional Sesi Kegiatan Pesantren
           </h3>
@@ -421,7 +421,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
         </div>
 
         {/* Section 3: Pejabat Penandatangan Laporan PDF */}
-        <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
+        <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
           <h3 className="font-display font-black text-slate-950 text-sm border-b-2 border-slate-900/10 pb-2">
             3. Pejabat Penandatangan Dokumen Resmi &amp; Laporan PDF
           </h3>
@@ -468,7 +468,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
         </div>
 
         {/* Section 4: Tempat & Tanggal Dokumen Siap Cetak (Tanda Tangan & Titimangsa) */}
-        <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
+        <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-900/10 pb-2">
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-emerald-800" />
@@ -606,7 +606,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
         </div>
 
         {/* Section 5: Pola Jadwal Berulang Mingguan */}
-        <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
+        <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-slate-900/10 pb-2">
             <div className="flex items-center gap-2">
               <Repeat className="w-4 h-4 text-purple-700" />
@@ -614,8 +614,8 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
                 5. Pola Jadwal Piket Berulang Mingguan (Tanpa Input Manual Berulang)
               </h3>
             </div>
-            <span className="neo-badge inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-black bg-[#EDE9FE] text-purple-950">
-              <Sparkles className="w-3 h-3 text-purple-700" />
+            <span className="neo-badge inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-black bg-[#FEF08A] text-amber-950 border border-slate-900 shadow-2xs">
+              <Zap className="w-3.5 h-3.5 text-amber-600 fill-amber-400" />
               Generator Otomatis
             </span>
           </div>
@@ -728,9 +728,9 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
                 type="button"
                 onClick={() => handleGenerateFromSettings('next_month')}
                 disabled={isGenerating}
-                className="neo-btn px-3.5 py-2 text-xs font-black text-emerald-950 bg-[#BBF7D0] hover:bg-[#86EFAC] disabled:opacity-50 rounded-xl flex items-center gap-1.5 cursor-pointer"
+                className="neo-btn px-3.5 py-2 text-xs font-black text-amber-950 bg-[#FEF08A] hover:bg-[#FDE047] disabled:opacity-50 rounded-xl flex items-center gap-1.5 cursor-pointer border border-slate-900 shadow-xs"
               >
-                <Sparkles className="w-3.5 h-3.5 text-emerald-800" />
+                <Zap className="w-3.5 h-3.5 text-amber-600 fill-amber-400" />
                 <span>{isGenerating ? 'Memproses...' : 'Generate Bulan Depan'}</span>
               </button>
             </div>
@@ -750,7 +750,7 @@ export const PengaturanView: React.FC<PengaturanViewProps> = ({
       </form>
 
       {/* Section 6: Supabase Cloud Database Status (Env-Only) */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
+      <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
         <div className="flex items-center justify-between border-b-2 border-slate-900/10 pb-2">
           <div className="flex items-center gap-2">
             <Database className="w-4 h-4 text-emerald-700" />

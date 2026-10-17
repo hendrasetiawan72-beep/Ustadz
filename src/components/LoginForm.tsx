@@ -114,7 +114,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
 
       <div className="w-full max-w-md relative z-10">
         {/* Main Card with Neobrutalist Rounded Postmodern Pastel Aesthetic */}
-        <div className="bg-[#FFFDF9] rounded-[2rem] border-2 border-slate-900 shadow-[6px_6px_0px_#1e293b] overflow-hidden">
+        <div className="bg-white rounded-[2rem] border-2 border-slate-900 shadow-[6px_6px_0px_#1e293b] overflow-hidden">
           {/* Top Vintage Pastel Header Bar */}
           <div className="bg-[#FEF9C3] border-b-2 border-slate-900 px-6 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -155,7 +155,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ settings, onLoginSuccess }
           </div>
 
           {/* Form Body: Simple Email & Password */}
-          <div className="p-7 pt-6 bg-[#FFFDF9]">
+          <div className="p-7 pt-6 bg-white">
             {errorMessage && (
               <div className="mb-4 p-3 bg-rose-100 border-2 border-slate-900 text-rose-950 rounded-xl text-xs flex items-center gap-2 shadow-[2px_2px_0px_#1e293b] font-medium">
                 <AlertCircle className="w-4 h-4 shrink-0 text-rose-700" />

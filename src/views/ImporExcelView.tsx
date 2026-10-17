@@ -142,7 +142,7 @@ export const ImporExcelView: React.FC<ImporExcelViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Header: Postmodern Neobrutalist Rounded Canvas */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="neo-badge px-3 py-0.5 text-[10px] font-black bg-[#DCFCE7] text-emerald-950 uppercase tracking-wider inline-flex items-center gap-1">
@@ -160,7 +160,7 @@ export const ImporExcelView: React.FC<ImporExcelViewProps> = ({
       </div>
 
       {/* Module Selector & Template Download Bar */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col md:flex-row md:items-center justify-between gap-6 text-xs">
+      <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col md:flex-row md:items-center justify-between gap-6 text-xs">
         <div>
           <label className="block font-bold text-slate-900 mb-1 text-sm uppercase tracking-wide">
             Pilih Modul Data yang Ingin Diimpor:
@@ -206,7 +206,7 @@ export const ImporExcelView: React.FC<ImporExcelViewProps> = ({
 
       {/* File Upload Area */}
       {!validationResult && (
-        <div className="bg-[#FFFDF9] border-2 border-dashed border-slate-900 rounded-3xl p-10 text-center shadow-[4px_4px_0px_#1e293b]">
+        <div className="bg-white border-2 border-dashed border-slate-900 rounded-3xl p-10 text-center shadow-[4px_4px_0px_#1e293b]">
           <div className="w-16 h-16 rounded-2xl bg-[#DCFCE7] border-2 border-slate-900 text-emerald-950 mx-auto flex items-center justify-center mb-4 shadow-[2px_2px_0px_#1e293b]">
             <Upload className="w-8 h-8" />
           </div>
@@ -233,7 +233,7 @@ export const ImporExcelView: React.FC<ImporExcelViewProps> = ({
 
       {/* Validation Result Box */}
       {validationResult && (
-        <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-5 text-xs">
+        <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] space-y-5 text-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-slate-900/10 pb-4">
             <div>
               <span className="font-display text-sm font-black text-slate-950 block">

@@ -192,7 +192,7 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Header Card */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="neo-badge px-3 py-0.5 text-[10px] font-black bg-[#FEF08A] text-amber-950 uppercase tracking-wider inline-flex items-center gap-1">
@@ -244,7 +244,7 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
       )}
 
       {/* Control Session Bar */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-5 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
+      <div className="bg-white border-2 border-slate-900 rounded-2xl p-5 shadow-[4px_4px_0px_#1e293b] space-y-4 text-xs">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block font-bold text-slate-800 mb-1.5 uppercase text-[10px] tracking-wider">
@@ -336,7 +336,7 @@ export const KegiatanPagiView: React.FC<KegiatanPagiViewProps> = ({
       </div>
 
       {/* Santri Attendance List */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl shadow-[4px_4px_0px_#1e293b] overflow-hidden">
+      <div className="bg-white border-2 border-slate-900 rounded-2xl shadow-[4px_4px_0px_#1e293b] overflow-hidden">
         {/* Search header */}
         <div className="p-3.5 border-b-2 border-slate-900/10 flex items-center justify-between gap-3 text-xs bg-[#FAF7F2]">
           <div className="relative flex-1 max-w-sm">

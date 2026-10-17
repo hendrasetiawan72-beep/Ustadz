@@ -132,7 +132,7 @@ export const DataSantriView: React.FC<DataSantriViewProps> = ({
   return (
     <div className="space-y-6">
       {/* View Header: Postmodern Neobrutalist Rounded Canvas */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="neo-badge px-3 py-0.5 text-[10px] font-black bg-[#DCFCE7] text-emerald-950 uppercase tracking-wider inline-flex items-center gap-1">
@@ -170,7 +170,7 @@ export const DataSantriView: React.FC<DataSantriViewProps> = ({
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="bg-[#FFFDF9] p-4 border-2 border-slate-900 rounded-2xl shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+      <div className="bg-white p-4 border-2 border-slate-900 rounded-2xl shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -209,7 +209,7 @@ export const DataSantriView: React.FC<DataSantriViewProps> = ({
       </div>
 
       {/* Data Table */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl shadow-[4px_4px_0px_#1e293b] overflow-hidden">
+      <div className="bg-white border-2 border-slate-900 rounded-2xl shadow-[4px_4px_0px_#1e293b] overflow-hidden">
         <div className="p-4 border-b-2 border-slate-900/10 flex items-center justify-between text-xs bg-[#FAF7F2]">
           <span className="font-display font-black text-slate-950">
             Daftar Santri ({filteredList.length} dari {santriList.length})
@@ -282,7 +282,7 @@ export const DataSantriView: React.FC<DataSantriViewProps> = ({
       {/* Modal Add / Edit Santri */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#FFFDF9] rounded-[2rem] shadow-[8px_8px_0px_#1e293b] w-full max-w-lg p-6 sm:p-7 border-2 border-slate-900">
+          <div className="bg-white rounded-[2rem] shadow-[8px_8px_0px_#1e293b] w-full max-w-lg p-6 sm:p-7 border-2 border-slate-900">
             <h3 className="font-display text-lg font-black text-slate-950 mb-1">
               {editingSantri ? 'Edit Data Santri' : 'Tambah Santri Baru'}
             </h3>

@@ -12,7 +12,7 @@ import {
   CheckCircle2,
   Clock,
   ArrowRight,
-  Sparkles,
+  Zap,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -121,11 +121,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner & Quick Actions: Postmodern Neobrutalist Rounded Canvas */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-[2rem] p-6 sm:p-8 shadow-[5px_5px_0px_#1e293b] flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative overflow-hidden">
+      <div className="bg-white border-2 border-slate-900 rounded-[2rem] p-6 sm:p-8 shadow-[5px_5px_0px_#1e293b] flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative overflow-hidden">
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-2">
-            <span className="neo-badge px-3 py-0.5 text-[10px] font-black bg-[#DCFCE7] text-emerald-950 uppercase tracking-wider inline-flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block animate-pulse"></span>
+            <span className="neo-badge px-3 py-0.5 text-[10px] font-black bg-[#DCFCE7] text-emerald-950 uppercase tracking-wider inline-flex items-center gap-1.5 border border-slate-900 shadow-2xs">
+              <Zap className="w-3 h-3 text-emerald-800 fill-emerald-500" />
               Operasional Harian Aktif
             </span>
             <span className="text-xs font-bold text-slate-500">
@@ -276,7 +276,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Middle Section: Chart & Today's Duty Status */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left 2 Cols: Attendance Bar Chart */}
-        <div className="lg:col-span-2 bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b]">
+        <div className="lg:col-span-2 bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b]">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="font-display font-black text-slate-950 text-sm md:text-base flex items-center gap-2">
@@ -335,7 +335,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Right 1 Col: Status Santri Pie & Quick Verification */}
-        <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] flex flex-col justify-between">
+        <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b] flex flex-col justify-between">
           <div>
             <h3 className="font-display font-black text-slate-950 text-sm md:text-base">
               Distribusi Status Absensi
@@ -420,7 +420,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Bottom Section: Jadwal Pekan Ini & Riwayat Terakhir */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Jadwal Ustadz Pekan Ini */}
-        <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b]">
+        <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b]">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="font-display font-black text-slate-950 text-sm md:text-base">
@@ -479,7 +479,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Audit Log Feed */}
-        <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b]">
+        <div className="bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-[4px_4px_0px_#1e293b]">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="font-display font-black text-slate-950 text-sm md:text-base">

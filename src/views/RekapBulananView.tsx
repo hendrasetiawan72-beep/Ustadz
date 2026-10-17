@@ -145,7 +145,7 @@ export const RekapBulananView: React.FC<RekapBulananViewProps> = ({
   return (
     <div className="space-y-6">
       {/* View Header: Postmodern Neobrutalist Rounded Canvas */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="neo-badge px-3 py-0.5 text-[10px] font-black bg-[#BBF7D0] text-emerald-950 uppercase tracking-wider inline-flex items-center gap-1">
@@ -183,7 +183,7 @@ export const RekapBulananView: React.FC<RekapBulananViewProps> = ({
       </div>
 
       {/* Filter and Tab Bar */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-4 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs">
+      <div className="bg-white border-2 border-slate-900 rounded-2xl p-4 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs">
         {/* Tabs */}
         <div className="flex items-center p-1 bg-[#FAF7F2] rounded-xl border border-slate-900/20">
           <button
@@ -291,7 +291,7 @@ export const RekapBulananView: React.FC<RekapBulananViewProps> = ({
       </div>
 
       {/* Main Tab Content */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl shadow-[4px_4px_0px_#1e293b] overflow-hidden">
+      <div className="bg-white border-2 border-slate-900 rounded-2xl shadow-[4px_4px_0px_#1e293b] overflow-hidden">
         {activeTab === 'santri' ? (
           <div className="overflow-x-auto w-full">
             <table className="w-full text-left text-xs min-w-[850px]">

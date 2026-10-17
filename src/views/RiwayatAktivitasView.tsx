@@ -41,7 +41,7 @@ export const RiwayatAktivitasView: React.FC<RiwayatAktivitasViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Header: Postmodern Neobrutalist Rounded Canvas */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="neo-badge px-3 py-0.5 text-[10px] font-black bg-[#E0F2FE] text-sky-950 uppercase tracking-wider inline-flex items-center gap-1">
@@ -67,7 +67,7 @@ export const RiwayatAktivitasView: React.FC<RiwayatAktivitasViewProps> = ({
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-[#FFFDF9] p-4 border-2 border-slate-900 rounded-2xl shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col sm:flex-row gap-3 text-xs">
+      <div className="bg-white p-4 border-2 border-slate-900 rounded-2xl shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col sm:flex-row gap-3 text-xs">
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -96,7 +96,7 @@ export const RiwayatAktivitasView: React.FC<RiwayatAktivitasViewProps> = ({
       </div>
 
       {/* Audit Logs Feed Table */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl shadow-[4px_4px_0px_#1e293b] overflow-hidden">
+      <div className="bg-white border-2 border-slate-900 rounded-2xl shadow-[4px_4px_0px_#1e293b] overflow-hidden">
         <div className="p-4 border-b-2 border-slate-900/10 flex items-center justify-between text-xs bg-[#FAF7F2]">
           <span className="font-display font-black text-slate-950">
             Daftar Log Aktivitas ({filteredLogs.length})

@@ -13,7 +13,7 @@ import {
   Clock,
   Filter,
   Repeat,
-  Sparkles,
+  Zap,
   Calendar,
   X,
   Check,
@@ -326,7 +326,7 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
   return (
     <div className="space-y-6">
       {/* View Header: Postmodern Neobrutalist Rounded Canvas */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white border-2 border-slate-900 rounded-[1.75rem] p-6 shadow-[4.5px_4.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="neo-badge px-3 py-0.5 text-[10px] font-black bg-[#E0F2FE] text-sky-950 uppercase tracking-wider inline-flex items-center gap-1">
@@ -378,7 +378,7 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
       </div>
 
       {/* Quick Recurring Alert / Generator Banner */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-4 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+      <div className="bg-white border-2 border-slate-900 rounded-2xl p-4 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-9 h-9 rounded-xl bg-[#EDE9FE] border border-slate-900 flex items-center justify-center shrink-0 text-purple-800 shadow-[1.5px_1.5px_0px_#1e293b]">
             <Repeat className="w-4 h-4" />
@@ -397,15 +397,15 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
         </div>
         <button
           onClick={() => setIsRecurringModalOpen(true)}
-          className="neo-btn px-3.5 py-2 font-black text-xs text-purple-950 bg-[#DDD6FE] hover:bg-[#C4B5FD] rounded-xl flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+          className="neo-btn px-3.5 py-2 font-black text-xs text-amber-950 bg-[#FEF08A] hover:bg-[#FDE047] rounded-xl flex items-center justify-center gap-1.5 shrink-0 cursor-pointer border-1.5 border-slate-900 shadow-[2px_2px_0px_#1e293b]"
         >
-          <Sparkles className="w-3.5 h-3.5 text-purple-800" />
+          <Zap className="w-3.5 h-3.5 text-amber-600 fill-amber-400" />
           <span>Buka Pengaturan Berulang</span>
         </button>
       </div>
 
       {/* Session Filter Tabs */}
-      <div className="bg-[#FFFDF9] p-3 border-2 border-slate-900 rounded-2xl shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+      <div className="bg-white p-3 border-2 border-slate-900 rounded-2xl shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-1.5 bg-[#FAF7F2] p-1.5 rounded-xl border border-slate-900/20">
           <button
             onClick={() => setSessionFilter('all')}
@@ -447,7 +447,7 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
       </div>
 
       {/* Schedule Table */}
-      <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl shadow-[4px_4px_0px_#1e293b] overflow-hidden">
+      <div className="bg-white border-2 border-slate-900 rounded-2xl shadow-[4px_4px_0px_#1e293b] overflow-hidden">
         <div className="overflow-x-auto w-full">
           <table className="w-full text-left text-xs min-w-[700px]">
             <thead className="bg-[#FEF9C3] text-slate-900 border-b-2 border-slate-900 font-bold uppercase tracking-wider text-[11px]">
@@ -563,7 +563,7 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
       {/* Modal Add / Edit Jadwal Piket with Neobrutalist Rounded Styling */}
       {(isAddModalOpen || isEditModalOpen) && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#FFFDF9] rounded-[2rem] shadow-[8px_8px_0px_#1e293b] w-full max-w-lg p-6 sm:p-7 border-2 border-slate-900">
+          <div className="bg-white rounded-[2rem] shadow-[8px_8px_0px_#1e293b] w-full max-w-lg p-6 sm:p-7 border-2 border-slate-900">
             <h3 className="font-display text-lg font-black text-slate-950 mb-1">
               {isEditModalOpen ? 'Edit Jadwal Piket' : 'Tetapkan Jadwal Piket Baru'}
             </h3>
@@ -731,7 +731,7 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
       {/* Recurring Schedule Modal */}
       {isRecurringModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-[#FFFDF9] rounded-[2rem] border-2 border-slate-900 shadow-[8px_8px_0px_#1e293b] w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden">
+          <div className="bg-white rounded-[2rem] border-2 border-slate-900 shadow-[8px_8px_0px_#1e293b] w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden">
             {/* Modal Header */}
             <div className="bg-[#EDE9FE] border-b-2 border-slate-900 px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -1079,10 +1079,10 @@ export const JadwalPiketView: React.FC<JadwalPiketViewProps> = ({
                   type="button"
                   onClick={handleExecuteGenerate}
                   disabled={isGenerating}
-                  className="neo-btn px-5 py-2.5 text-xs font-black text-purple-950 bg-[#DDD6FE] hover:bg-[#C4B5FD] disabled:opacity-50 rounded-xl flex items-center gap-2 cursor-pointer shadow-[2.5px_2.5px_0px_#1e293b]"
+                  className="neo-btn px-5 py-2.5 text-xs font-black text-amber-950 bg-[#FEF08A] hover:bg-[#FDE047] disabled:opacity-50 rounded-xl flex items-center gap-2 cursor-pointer shadow-[2.5px_2.5px_0px_#1e293b]"
                 >
-                  <Sparkles className="w-4 h-4 text-purple-800" />
-                  <span>{isGenerating ? 'Sedang Memproses...' : '🚀 Generate Jadwal Otomatis Sekarang'}</span>
+                  <Zap className="w-4 h-4 text-amber-600 fill-amber-400" />
+                  <span>{isGenerating ? 'Sedang Memproses...' : '⚡ Generate Jadwal Otomatis Sekarang'}</span>
                 </button>
               )}
             </div>
