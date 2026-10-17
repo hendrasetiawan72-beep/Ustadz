@@ -305,7 +305,11 @@ export default function App() {
   const role = currentUser.role;
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] flex flex-col selection:bg-amber-200 selection:text-amber-950">
+    <div
+      className={`min-h-screen bg-[#FAF7F2] flex flex-col selection:bg-amber-200 selection:text-amber-950 ${
+        previewModal.isOpen ? 'print:bg-white print:min-h-0 print:p-0 print:m-0 print:block' : ''
+      }`}
+    >
       {/* Notice Banner: MODE DEMO */}
       {!isSupabaseLive && (
         <div className="no-print bg-[#FEF08A] border-b-2 border-slate-900 px-4 py-1.5 text-center text-xs font-black text-amber-950 flex items-center justify-center gap-2 shadow-2xs">
@@ -337,7 +341,7 @@ export default function App() {
       />
 
       {/* Main Layout Area */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className={`flex-1 flex overflow-hidden relative ${previewModal.isOpen ? 'print:hidden' : ''}`}>
         {/* Navigation Sidebar with Role Filtering */}
         <Sidebar
           currentTab={currentTab}

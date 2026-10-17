@@ -124,8 +124,8 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
   const santriMap = new Map(data.santriList.map((s) => [s.id, s]));
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/65 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-[2rem] shadow-[8px_8px_0px_#1e293b] w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden border-2 border-slate-900">
+    <div className="report-modal-overlay fixed inset-0 z-50 bg-slate-950/65 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto print:static print:inset-auto print:z-auto print:p-0 print:m-0 print:bg-white print:block print:overflow-visible print:w-full print:h-auto">
+      <div className="report-modal-dialog bg-white rounded-[2rem] shadow-[8px_8px_0px_#1e293b] w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden border-2 border-slate-900 print:rounded-none print:shadow-none print:border-none print:max-w-none print:max-h-none print:w-full print:overflow-visible print:m-0 print:p-0 print:block">
         {/* Modal Top Bar */}
         <div className="no-print flex items-center justify-between px-6 py-4 bg-[#FEF9C3] border-b-2 border-slate-900">
           <div className="flex items-center gap-3">
@@ -184,8 +184,8 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
         </div>
 
         {/* Modal Printable Sheet Container */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-10 bg-slate-100 flex justify-center">
-          <div className="bg-white w-full max-w-[210mm] min-h-[297mm] p-8 md:p-12 shadow-md border border-slate-200 text-slate-900 text-sm">
+        <div className="report-modal-sheet-wrapper flex-1 overflow-y-auto p-6 md:p-10 bg-slate-100 flex justify-center print:p-0 print:m-0 print:bg-white print:overflow-visible print:block print:w-full">
+          <div className="report-printable-sheet bg-white w-full max-w-[210mm] min-h-[297mm] p-8 md:p-12 shadow-md border border-slate-200 text-slate-900 text-sm print:max-w-none print:min-h-0 print:p-0 print:m-0 print:shadow-none print:border-none print:w-full print:text-black">
             {/* Kop Surat Resmi */}
             <KopSurat
               settings={settings}
@@ -194,8 +194,8 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
             />
 
             {/* Document Content Table */}
-            <div className="mt-4 overflow-x-auto w-full">
-              <table className="w-full border-collapse border border-slate-300 text-xs min-w-[520px]">
+            <div className="mt-4 overflow-x-auto w-full print:overflow-visible print:mt-2">
+              <table className="w-full border-collapse border border-slate-300 text-xs min-w-[520px] print:min-w-0 print:text-[10pt] print:border-slate-400">
                 <thead>
                   <tr className="bg-slate-100 text-slate-800 border-b border-slate-300">
                     <th className="border border-slate-300 p-2 text-center w-10">No</th>
@@ -305,7 +305,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
             </div>
 
             {/* Formal Signature Blocks */}
-            <div className="mt-12 pt-6 grid grid-cols-2 text-xs text-slate-800">
+            <div className="document-signature-block mt-12 pt-6 grid grid-cols-2 text-xs text-slate-800 print:mt-8 print:text-[10pt] print:break-inside-avoid">
               <div className="text-center">
                 <p>Mengetahui / Memeriksa,</p>
                 <p className="font-semibold mt-1">Koordinator Piket & Kesantrian</p>

@@ -96,17 +96,38 @@
 
 @media print {
   @page {
-    size: A4;
-    margin: 15mm 15mm 15mm 20mm;
+    size: A4 portrait;
+    margin: 10mm 15mm 15mm 15mm;
   }
 
-  body {
-    background-color: #FFFFFF !important;
-    color: #0F172A !important;
-    font-size: 11pt;
+  /* Force pure white background on the entire document */
+  html,
+  body,
+  #root {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    min-height: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    font-size: 10pt;
   }
 
-  .no-print {
+  /* Strip all box shadows, text shadows, and force exact color reproduction */
+  *,
+  *::before,
+  *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print,
+  .no-print * {
     display: none !important;
   }
 
@@ -114,7 +135,95 @@
     display: block !important;
   }
 
+  /* Reset all modal containers so they don't render as cards or dialogs on paper */
+  .report-modal-overlay {
+    position: static !important;
+    inset: auto !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .report-modal-dialog {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    display: block !important;
+  }
+
+  .report-modal-sheet-wrapper {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .report-printable-sheet {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  /* Formal table borders for paper document */
+  .report-printable-sheet table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto;
+  }
+
+  .report-printable-sheet th,
+  .report-printable-sheet td {
+    border: 1px solid #334155 !important;
+    padding: 5px 8px !important;
+  }
+
+  .report-printable-sheet thead tr {
+    background-color: #f1f5f9 !important;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .document-signature-block {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
   .print-page-break {
     page-break-after: always;
+    break-after: page;
   }
 }
+
