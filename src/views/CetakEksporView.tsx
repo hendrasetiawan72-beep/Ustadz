@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   AlertCircle,
   FileCheck,
+  MapPin,
 } from 'lucide-react';
 import {
   Ustadz,
@@ -19,7 +20,7 @@ import {
   ReportType,
   AppSettings,
 } from '../types';
-import { generatePesantrenPDF } from '../lib/pdf';
+import { generatePesantrenPDF, formatDocumentDate } from '../lib/pdf';
 import { exportDataToExcel } from '../lib/excel';
 
 interface CetakEksporViewProps {
@@ -228,6 +229,45 @@ export const CetakEksporView: React.FC<CetakEksporViewProps> = ({
           </p>
         </div>
       </div>
+
+      {/* Tempat & Tanggal Dokumen Siap Cetak Info Banner */}
+      {(() => {
+        const titimangsa = formatDocumentDate(settings);
+        const isManual = settings.documentDateMode === 'manual';
+        return (
+          <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-4 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-start sm:items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#FEF08A] border border-slate-900 flex items-center justify-center shrink-0 text-amber-950 shadow-[1.5px_1.5px_0px_#1e293b]">
+                <MapPin className="w-4 h-4 text-amber-800" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-display font-black text-slate-950 text-xs">
+                    Tempat &amp; Tanggal Dokumen Cetak:
+                  </span>
+                  <span
+                    className={`neo-badge px-2 py-0.2 text-[9px] font-black ${
+                      isManual ? 'bg-[#FEF08A] text-amber-950' : 'bg-[#DCFCE7] text-emerald-950'
+                    }`}
+                  >
+                    {isManual ? 'Mode Manual' : 'Mode Otomatis'}
+                  </span>
+                </div>
+                <p className="text-slate-800 font-bold mt-0.5 text-xs">
+                  {titimangsa.fullTitimangsa}
+                  <span className="text-[11px] font-normal text-slate-500 ml-2">
+                    (Tertera di atas tanda tangan resmi Pimpinan Ponpes)
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div className="text-[11px] text-slate-600 font-medium sm:text-right shrink-0">
+              <span>Edit tempat &amp; tanggal manual di </span>
+              <span className="font-bold text-slate-900">Bilah Pengaturan</span>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Filter and Period Selection Box */}
       <div className="bg-[#FFFDF9] border-2 border-slate-900 rounded-2xl p-4 shadow-[3.5px_3.5px_0px_#1e293b] flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs">

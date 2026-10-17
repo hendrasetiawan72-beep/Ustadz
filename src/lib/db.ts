@@ -139,6 +139,10 @@ export async function updateAppSettings(settings: Partial<AppSettings>): Promise
         duty_supervisor_name: updated.dutySupervisorName,
         duty_supervisor_nip: updated.dutySupervisorNip,
         kop_letterhead_enabled: updated.kopLetterheadEnabled,
+        document_city: updated.documentCity,
+        document_date_mode: updated.documentDateMode,
+        manual_document_date: updated.manualDocumentDate,
+        recurring_template: updated.recurringTemplate,
       });
     } catch (e) {
       console.warn('Supabase update failed:', e);
